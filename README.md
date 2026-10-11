@@ -10,7 +10,7 @@
 
 📹 Prezentacja działania — 2 min: `<DO UZUPEŁNIENIA: link YouTube>`
 
-🌐 Demo: brak publicznej instancji — `<DO UZUPEŁNIENIA: jedno zdanie, dlaczego>`. Aplikację uruchomisz lokalnie w kilka minut ([niżej](#jak-uruchomić)).
+🌐 Demo: **[doc.compare.twapp.pl](https://doc.compare.twapp.pl)** — działająca instancja (dane syntetyczne, bez kluczy AI). Logowanie tylko dla autora, bez konta gościa; przebieg pokazuje wideo. Lokalnie uruchomisz ją w kilka minut ([niżej](#jak-uruchomić)).
 
 > **Projekt portfolio.** Nazwy firm są zastąpione fikcyjnymi (ACME), dane demo i testowe są syntetyczne.
 
