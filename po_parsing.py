@@ -12,7 +12,7 @@ import re
 
 def clean_po_ref(db, raw, opis: str = ""):
     """Wyodrębnia czysty REF z komórki, w której PDF skleił REF + opis
-    (np. 'RNBS10001 easyCARE nitr. gloves…' → 'RNBS10001').
+    (np. 'ACGS10001 AcmeCare nitr. gloves…' → 'ACGS10001').
 
     Strategia:
       1) dopasowanie do master daty (najdłuższy znany REF będący prefiksem

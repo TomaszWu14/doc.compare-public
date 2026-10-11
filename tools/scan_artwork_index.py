@@ -18,19 +18,19 @@ Wymaga:  pip install requests
 
 Przykład (najpierw test):
   python scan_artwork_index.py --base-url https://compare.example.com \\
-      --user manager_login --root "Z:\\ISO\\WZORY ETYKIET I INSTRUKCJI" \\
+      --user manager_login --root "Z:\\ARTWORK\\MASTERS" \\
       --batch 500 --limit 1000 --dry-run
   # potem bez --dry-run, na końcu bez --limit (pełny skan)
 
 Szybka, częsta dosyłka SAMYCH podglądów (bez kosztownego skanu — do uruchamiania
 np. co 10 min w Harmonogramie zadań Windows):
   python scan_artwork_index.py --base-url https://compare.example.com \\
-      --user manager_login --root "Z:\\ISO\\WZORY ETYKIET I INSTRUKCJI" --only-upload
+      --user manager_login --root "Z:\\ARTWORK\\MASTERS" --only-upload
 
 Tryb CIĄGŁY (agent „pilnuje" sam — uruchom raz na maszynie zawsze online w sieci
 wewnętrznej; dosyła nowe podglądy automatycznie, bez ręcznego ładowania):
   python scan_artwork_index.py --base-url https://compare.example.com \\
-      --user manager_login --root "Z:\\ISO\\WZORY ETYKIET I INSTRUKCJI" \\
+      --user manager_login --root "Z:\\ARTWORK\\MASTERS" \\
       --watch --interval 120
 """
 import argparse

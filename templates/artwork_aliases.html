@@ -24,7 +24,7 @@ table.aa th{background:var(--accent-bg,#eff6ff);font-size:11px;font-weight:700}
 <div x-data="aliasApp()" x-init="load()" x-cloak>
   <div class="page-header">
     <h1>🎨 Aliasy artworków (nazwa pliku → REF)</h1>
-    <p>Gdy nazwa pliku artworku nie zawiera REF (np. <span class="aa-mono">easycare_nitrile_carton_S_a100</span> = <b>RNBS10001</b>),
+    <p>Gdy nazwa pliku artworku nie zawiera REF (np. <span class="aa-mono">acmecare_nitrile_carton_S_a100</span> = <b>ACGS10001</b>),
        dodaj alias — system powiąże pasujące pliki z REF (backfill + przyszłe skany).</p>
   </div>
 
@@ -33,11 +33,11 @@ table.aa th{background:var(--accent-bg,#eff6ff);font-size:11px;font-weight:700}
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
       <div class="fg">
         <label>REF (docelowy)</label>
-        <input x-model="ref" placeholder="np. RNBS10001">
+        <input x-model="ref" placeholder="np. ACGS10001">
       </div>
       <div class="fg" style="flex:1">
         <label>Fragment nazwy pliku</label>
-        <input x-model="pattern" placeholder="np. easycare_nitrile_carton_S" style="width:100%">
+        <input x-model="pattern" placeholder="np. acmecare_nitrile_carton_S" style="width:100%">
       </div>
       <button class="btn btn-primary" @click="add()" :disabled="!ref || !pattern">Dodaj alias</button>
       <button class="btn btn-ghost" @click="suggest()" :disabled="!ref" title="Podpowiedz pliki po opisie produktu z master daty">🔍 Podpowiedz po REF</button>

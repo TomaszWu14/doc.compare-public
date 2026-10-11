@@ -61,11 +61,11 @@ def generate(out_path: str):
         ws.column_dimensions[get_column_letter(i)].width = width
 
     ex1 = {
-        "ref_code": "RNBM10001", "opis_pl": "Rękawice nitrylowe bezpudrowe M",
-        "opis_en": "Nitrile examination gloves, powder-free, M", "ean": "5900010800001", "rodzina": "Rękawice",
-        "sztuka_wymiar": "240 x 120 x 5 mm", "sztuka_ean": "5900010800001", "sztuka_artwork_ref": "RNBM10001",
-        "op_wymiar": "245 x 125 x 70 mm", "op_ean": "5900010800018", "op_artwork_ref": "RNBM10001",
-        "karton_wymiar": "520 x 380 x 300 mm", "karton_ean": "5900010800025", "karton_artwork_ref": "RNBM10001-KARTON",
+        "ref_code": "ACGM10001", "opis_pl": "Rękawice nitrylowe bezpudrowe M",
+        "opis_en": "Nitrile examination gloves, powder-free, M", "ean": "2000010800001", "rodzina": "Rękawice",
+        "sztuka_wymiar": "240 x 120 x 5 mm", "sztuka_ean": "2000010800001", "sztuka_artwork_ref": "ACGM10001",
+        "op_wymiar": "245 x 125 x 70 mm", "op_ean": "2000010800018", "op_artwork_ref": "ACGM10001",
+        "karton_wymiar": "520 x 380 x 300 mm", "karton_ean": "2000010800025", "karton_artwork_ref": "ACGM10001-KARTON",
     }
     ex2 = {"ref_code": "AT-NF-S 15", "opis_pl": "Serweta niejałowa 15x15", "opis_en": "Non-sterile drape 15x15",
            "rodzina": "Serwety", "karton_wymiar": "400 x 300 x 250 mm", "karton_artwork_ref": "AT-NF-S 15"}

@@ -10,7 +10,7 @@ REM  KONFIGURACJA — uzupelnij 3 wartosci ponizej:
 REM ============================================================================
 set BASE_URL=https://compare.example.com
 set DC_USER=ZMIEN_NA_LOGIN_MANAGERA
-set ROOT=Z:\ISO\WZORY ETYKIET I INSTRUKCJI
+set ROOT=Z:\ARTWORK\MASTERS
 
 REM Haslo: ustaw zmienna srodowiskowa DOCCOMPARE_PASS (bezpieczniej niz wpisywac tu).
 REM   - w Harmonogramie zadan: dodaj zmienna srodowiskowa konta, albo

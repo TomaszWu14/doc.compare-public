@@ -17,10 +17,10 @@ def test_longest_type_wins():
 
 
 def test_ean_and_revision():
-    r = P("805016_pouch_2 Rev.00_5900010800810.pdf")
+    r = P("805016_pouch_2 Rev.00_2000010800810.pdf")
     assert r["ref"] == "805016"
     assert r["packaging_type"] == "pouch"
-    assert r["ean"] == "5900010800810"
+    assert r["ean"] == "2000010800810"
     assert r["revision"].lower().startswith("rev")
     assert r["revision_rank"] == 0
 

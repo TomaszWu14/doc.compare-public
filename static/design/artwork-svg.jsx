@@ -1,5 +1,5 @@
 // Stylized packaging artwork preview.
-// Renders the "easyCARE" gauze pack mockup as inline SVG so we can
+// Renders the "AcmeCare" gauze pack mockup as inline SVG so we can
 // place diff markers, callouts, and "before/after" overlays on top of it.
 //
 // <PackArtwork variant="a" | "b" width={...} markers={[{id, sev, x, y, w, h}]} />
@@ -46,7 +46,7 @@ function PackArtwork({ variant='a', width=520, markers=[], showGrid=false, showB
           <rect width={logoW*0.28} height="22" fill="#fdfcf7" rx="1" />
           <text x={logoW*0.14} y="17" fontFamily="Geist, sans-serif" fontWeight="700"
                 fontSize="14" fill={teal} textAnchor="middle"
-                letterSpacing="-0.5">Z</text>
+                letterSpacing="-0.5">A</text>
           <text x={logoW*0.28 + 6} y="17" fontFamily="Geist, sans-serif" fontWeight="600"
                 fontSize="12" fill="#fdfcf7" letterSpacing=".02em">ACME</text>
         </g>
@@ -54,7 +54,7 @@ function PackArtwork({ variant='a', width=520, markers=[], showGrid=false, showB
         {/* product name */}
         <text x={W/2} y="36" textAnchor="middle"
               fontFamily="Newsreader, serif" fontStyle="italic" fontSize="18" fill="#fdfcf7"
-              letterSpacing=".01em">easyCARE</text>
+              letterSpacing=".01em">AcmeCare</text>
 
         {/* product subtitle inside body */}
         <text x="22" y="78" fontFamily="Geist, sans-serif" fontWeight="600"
@@ -137,7 +137,7 @@ function PackArtwork({ variant='a', width=520, markers=[], showGrid=false, showB
           <text x="86" y="14" fontFamily="Geist, sans-serif" fontWeight="600"
                 fontSize="7" fill="#6e6c63" letterSpacing=".06em">REF</text>
           <text x="86" y="26" fontFamily="Geist Mono, monospace" fontSize="9" fill="#14130f">
-            ZAY-EC-200
+            ACM-EC-200
           </text>
 
           {/* expiry — shifted Y on B */}
