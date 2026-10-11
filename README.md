@@ -1,102 +1,105 @@
-# DocCompare v6
+# DocCompare
 
-[![ci](https://github.com/TomaszWu14/doccompare/actions/workflows/ci.yml/badge.svg)](https://github.com/TomaszWu14/doccompare/actions/workflows/ci.yml)
+[![ci](https://github.com/TomaszWu14/doc.compare-public/actions/workflows/ci.yml/badge.svg)](https://github.com/TomaszWu14/doc.compare-public/actions/workflows/ci.yml)
 
-![Line-level comparison of two trade documents — quantity and price mismatches flagged in red](docs/img/porownanie-dokumentow.png)
+**Porównuje dokumenty importowe (zamówienie, proformę, fakturę, listę pakową, zgłoszenie celne) linia po linii i zatrzymuje dostawę, zanim rozbieżność ilości lub ceny dotrze do odprawy — dla działów zakupów i logistyki.**
 
-**Compares international trade documents (PO, invoices, packing lists, customs declarations) line by line for purchasing and logistics teams, and flags price, quantity and Incoterms mismatches before they reach customs or settlement.**
+![Wynik porównania zamówienia z proformą — różnica ilości zaznaczona na czerwono](docs/screenshots/porownanie-dokumentow.png)
 
-> **Portfolio project.** Company names are replaced with fictional ones; demo and test data are synthetic.
->
-> Source shared for review (portfolio), all rights reserved — see [`LICENSE`](LICENSE).
+🎞️ GIF z działania: `<DO UZUPEŁNIENIA: docs/screenshots/demo.gif — nagram>`
 
-A Flask web application for ACME that intelligently compares
-international trade documents (Purchase Orders, Proforma/Commercial Invoices, Packing Lists,
-Customs Declarations / SAD, B/L, WZ, FV) and artwork/packaging PDFs, and manages the end-to-end
-purchasing → transport → customs → settlement workflow.
+📹 Prezentacja działania — 2 min: `<DO UZUPEŁNIENIA: link YouTube>`
 
-Originally deployed with Docker on **Coolify / Hetzner**; this portfolio copy ships no deploy workflow.
+🌐 Demo: brak publicznej instancji — `<DO UZUPEŁNIENIA: jedno zdanie, dlaczego>`. Aplikację uruchomisz lokalnie w kilka minut ([niżej](#jak-uruchomić)).
 
-## At a glance
+> **Projekt portfolio.** Nazwy firm są zastąpione fikcyjnymi (ACME), dane demo i testowe są syntetyczne.
 
-| | |
+## Problem → rozwiązanie
+
+Jedna dostawa importowa to kilka dokumentów od różnych stron, każdy w innym układzie. Zespół
+sprawdzał je ręcznie, a stan dostaw żył w Excelu i w mailach, więc błąd w ilości lub cenie wychodził
+dopiero przy odprawie albo rozliczeniu. DocCompare czyta tabele z PDF, dopasowuje pozycje mimo różnych
+zapisów kodów i porównuje je z tolerancjami z profilu dostawcy. Wynik trafia na kartę dostawy:
+niezgodność blokuje kolejny krok, a przed odprawą aplikacja wymaga zatwierdzonego kompletu dokumentów.
+
+## Dokumentacja analityczna
+
+| Dokument | Co zawiera |
 |---|---|
-| **Problem** | Purchasing and logistics teams cross-checked PO ↔ Proforma ↔ Commercial Invoice ↔ Packing List ↔ SAD by hand — price, quantity and Incoterms mismatches surfaced only at customs or settlement. |
-| **Solution** | PDF/table extraction with per-supplier column profiles, line-level comparison with tolerances, customs (SAD) checks, artwork validation (EAN/GS1), and a purchasing → transport → customs → settlement workflow. |
-| **Stack** | Python, Flask, pdfplumber / PyMuPDF / camelot, RapidOCR + Tesseract, optional LLM validation (Anthropic API), PostgreSQL/SQLite, RQ/Redis jobs, gunicorn, Docker. |
-| **Quality** | ~600 tests (`pytest tests/`), CI on GitHub Actions, scheduled security scans. |
+| [01 — Problem i zakres](docs/01-problem-i-zakres.md) | Jak proces wyglądał przed aplikacją, interesariusze i role, co jest w zakresie, a co poza nim. |
+| [02 — Proces](docs/02-proces.md) | Proces PRZED i PO z diagramami, aktorzy, punkty decyzyjne z warunkami z kodu, maszyna stanów dostawy. |
+| [03 — User flow](docs/03-user-flow.md) | Mapa 75 ekranów i przejść: diagramy per obszar, tabela ekranów, ścieżki alternatywne i ślepe zaułki. |
+| [04 — Model danych](docs/04-model-danych.md) | ERD, opis encji, reguły integralności i miejsca, gdzie model nie trzyma ograniczeń. |
+| [05 — Wymagania](docs/05-wymagania.md) | Wymagania z kryteriami akceptacji i wskazaniem, gdzie są zrealizowane i przetestowane. |
+| [06 — Decyzje](docs/06-decyzje.md) | Dziennik 12 decyzji: kontekst, rozważane opcje, uzasadnienie, skutki. |
+| [07 — Ograniczenia](docs/07-ograniczenia.md) | Czego aplikacja nie robi, funkcje opisane, ale niezaimplementowane, znane problemy, co dalej. |
 
-## Quick start (light)
+Starsze dokumenty w `docs/` (runbook IT, backup, kolejkowanie, plan refaktoru) opisują stronę techniczną.
+`PROCES_ZAKUPY_FLOW.md` i `PROCES_POTWIERDZENIE_ETD.md` to proces docelowy — stan obecny opisują 02 i 07.
 
-The full `requirements.txt` pulls in the ML/OCR stack (PyTorch, DocTR, …) — several GB.
-To run the tests and the core comparison logic, the same light set as CI is enough:
+## Jak uruchomić
+
+Pełne `requirements.txt` instaluje stos ML/OCR (PyTorch, DocTR…) — kilka GB. Do testów i głównej
+logiki porównania wystarczy lekki zestaw, ten sam co w CI (Python 3.11+):
 
 ```bash
-python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+python -m venv .venv
+source .venv/bin/activate            # Windows: .venv\Scripts\activate
 pip install pytest python-dateutil dateparser babel flask werkzeug pydantic pypdf \
             reportlab pdfplumber rapidfuzz numpy "pandas>=2.0"
-python -m pytest tests/ -q        # ~600 tests, tests needing heavy deps are skipped
-python app.py                     # http://localhost:5000 (OCR/ML/artwork features need the full stack)
+
+python -m pytest tests/ -q           # ~600 testów; te, które wymagają ciężkich zależności, są pomijane
+python migrate_db.py                 # schemat bazy (SQLite w instance/) — bez tego część ekranów zwraca 500
+python app.py                        # http://localhost:5000
 ```
 
-## My contribution
+Bez pliku `.env` aplikacja startuje na SQLite. Przy pierwszym starcie tworzy konta `admin`, `superuser`,
+`jan.kowalski` i `anna.nowak` z **losowymi hasłami**. Hasło admina jest wypisywane w konsoli i zapisywane
+w `INITIAL_ADMIN_PASSWORD.txt` (plik w `.gitignore`); hasła pozostałych kont ustawia admin.
+Funkcje OCR, ML i walidacja AI wymagają pełnego `requirements.txt` oraz kluczy z `.env.example`.
 
-- **Design and implementation of the whole application** — I am the sole author: process analysis with purchasing/logistics, data model, extraction cascade, comparison engine, UI, tests and deployment.
-- **Extraction and comparison engine** — PDF/table extraction cascade (PyMuPDF → Camelot → pdfplumber → OCR) with per-supplier column profiles, and line-level matching with tolerances.
-- **Scale:** ~600 tests (`pytest tests/`), ~410 Flask routes covering purchasing → transport → customs → settlement.
-- **Beyond comparison:** customs (SAD) checks, artwork validation (EAN/GS1), invoice → Excel extraction, optional LLM validation via the Anthropic API.
+## Stack i dlaczego taki
 
-## Why this stack
+| Element | Dlaczego |
+|---|---|
+| **Python + Flask** | Narzędzie wewnętrzne oparte na dokumentach: strony renderowane po stronie serwera, bez osobnego builda front-endu. Moduły wydzielane stopniowo do blueprintów ([D-05](docs/06-decyzje.md)). |
+| **pdfplumber / PyMuPDF / Camelot + OCR (Mistral, RapidOCR, Tesseract)** | Żadna pojedyncza biblioteka nie radzi sobie z układem każdego dostawcy, więc ekstrakcja to kaskada: tańsze metody najpierw, OCR tylko dla skanów ([D-03](docs/06-decyzje.md)). |
+| **rapidfuzz + TF-IDF** | Dostawcy zapisują te same kody inaczej (`NL753-S-40` ≈ `NL753S40`); dopasowanie rozmyte zamiast porównania tekstów. |
+| **Reguły deterministyczne + opcjonalnie API Claude** | O zgodności decydują reguły i tolerancje z profilu dostawcy; AI ocenia ryzyko na gotowym wyniku, a jej sugestie czekają na akceptację managera. Aplikacja działa bez klucza API ([D-01](docs/06-decyzje.md)). |
+| **SQLite (dev) / PostgreSQL (prod) przez `db.py`** | Jedna warstwa tłumaczy dialekty SQL, więc lokalnie nie trzeba stawiać serwera bazy ([D-04](docs/06-decyzje.md)). |
+| **Wątki + RQ/Redis z fallbackiem** | Ciężkie zadania (paczki artworków, ekstrakcja) nie blokują żądania HTTP; bez Redisa działają w wątkach ([D-06](docs/06-decyzje.md)). |
+| **Docker + gunicorn** | Oryginał był wdrażany jako kontener na Coolify / Hetzner; ta kopia portfolio nie ma workflow wdrożenia. |
+| **Alpine.js, Tailwind, Chart.js** | Interaktywność w szablonach Jinja bez frameworka SPA. |
+| **pytest + GitHub Actions** | ~600 testów czystej logiki uruchamianych w CI w kilkadziesiąt sekund; ciężkie importy ML są leniwe ([D-11](docs/06-decyzje.md)). |
 
-Flask keeps a document-heavy internal tool simple: server-rendered pages, blueprints for modules and no separate front-end build. PDF work relies on mature Python libraries (PyMuPDF, pdfplumber, Camelot) chained as a fallback cascade, with OCR (RapidOCR, Tesseract) only for scans, because no single extractor handles every supplier's layout. LLM validation is optional and runs behind deterministic rules, so the app still works without an API key. SQLite for local work and PostgreSQL in production, with RQ/Redis moving heavy jobs off the web process.
+## Zakres i ograniczenia
 
-## Limitations and next steps
+- **W zakresie:** porównanie PO/PI/CI/PL/SAD, karta dostawy z bramkami, checklista celna, portale
+  spedytora i agencji celnej, porównanie artworków z walidacją EAN/GS1, Faktury → Excel, ocena ryzyka AI.
+- **Poza zakresem:** integracja z SAP (wzorcem jest PDF zamówienia), automatyczne alerty e-mail,
+  portal potwierdzeń ETD dla dostawcy. Pełna lista z powodami: [01](docs/01-problem-i-zakres.md#5-poza-zakresem-nie-zaimplementowane).
+- **Znane problemy** (np. przyjęcie magazynowe nie tworzy się automatycznie, ceny porównywane bez
+  waluty) i ograniczenia techniczne (`app.py` ~20 tys. linii, ciężkie zależności ML):
+  [07 — Ograniczenia](docs/07-ograniczenia.md).
 
-- **`app.py` is still a large module** (~20k lines); [`docs/PLAN_REFAKTORU.md`](docs/PLAN_REFAKTORU.md) describes the move to blueprints without changing the framework.
-- **Heavy ML dependencies** — PyTorch costs roughly 2 GB RAM per worker; CI only covers the light, pure-logic part, ML/OCR paths are not exercised there.
-- **In-process state** — parts of the state live in module memory, which is risky with multiple workers (see [`AUDIT_2026-06-08.md`](AUDIT_2026-06-08.md)).
-- **Open audit items** — [`AUDIT_2026-06-08.md`](AUDIT_2026-06-08.md) lists findings by severity plus 100 improvement questions to work through.
-- **No deploy workflow** in this portfolio copy — the original ran on Docker / Coolify / Hetzner.
+## Kod — od czego zacząć
 
-## Where to start reading
+- [`enhanced_comparator.py`](enhanced_comparator.py) — rozbiór tabel na pozycje i porównanie z tolerancjami.
+- [`delivery_workflow.py`](delivery_workflow.py) — kroki karty dostawy, statusy, SLA.
+- [`pdf_extractor.py`](pdf_extractor.py) — kaskada ekstrakcji tekstu i tabel.
+- [`invoice_pipeline.py`](invoice_pipeline.py) — jedna faktura od profilu dostawcy do zapisanych pozycji.
 
-- [`enhanced_comparator.py`](enhanced_comparator.py) — table parsing into line items and the line-level comparison with tolerances.
-- [`pdf_extractor.py`](pdf_extractor.py) — the text/table extraction cascade with fallbacks.
-- [`invoice_pipeline.py`](invoice_pipeline.py) — one invoice end to end: supplier profile gate → extraction → mapping → saved items.
+Historia commitów została spłaszczona przy przygotowaniu wersji portfolio (anonimizacja).
 
-Commit history was squashed while preparing the portfolio version (anonymisation).
+## Kontekst projektu
 
-## Video
+`<DO UZUPEŁNIENIA: w jakiej roli i dla kogo powstał projekt, okres, ilu użytkowników>`
 
-Coming soon (YouTube).
+**Mój wkład.** Jestem jedynym autorem: analiza procesu z działami zakupów i logistyki, model danych,
+kaskada ekstrakcji, silnik porównania, interfejs, testy i wdrożenie. Skala: ~600 testów, ~410 tras
+Flask obejmujących zakupy → transport → cło → rozliczenie.
 
-## Common Commands
+---
 
-```bash
-# Install dependencies (full stack incl. ML/OCR — large)
-pip install -r requirements.txt
-# Production subset
-pip install -r requirements-prod.txt
-# Dev tooling only (pytest, ruff)
-pip install -r dev-requirements.txt
-
-# Run the development server (http://localhost:5000, debug on)
-python app.py
-
-# Run with gunicorn (production-like)
-gunicorn app:app -c gunicorn.conf.py
-
-# Apply database migrations (idempotent — safe to re-run)
-python migrate_db.py
-
-# Run the test suite
-python -m pytest tests/ -q
-```
-
-## Documentation
-
-- [`CLAUDE.md`](./CLAUDE.md) — architecture overview, conventions, and environment variables.
-- [`docs/DOKUMENTACJA_IT.md`](./docs/DOKUMENTACJA_IT.md) — IT runbook (Polish), hosting and
-  operations summary.
-- [`docs/BACKUP_RESTORE.md`](./docs/BACKUP_RESTORE.md) — database and data backup/restore
-  procedure.
+Licencja: wszelkie prawa zastrzeżone, kod udostępniony do wglądu — [`LICENSE`](LICENSE).
+Notatki dla deweloperów i agentów AI: [`CLAUDE.md`](CLAUDE.md), [`AGENTS.md`](AGENTS.md).
