@@ -1,3 +1,7 @@
+> **Uwaga: proces docelowy (wizja).** Ten dokument opisuje zamierzony proces. Część kroków
+> nie jest zaimplementowana (np. integracja z SAP BW, moduł `/kolejka`, zgoda na wypłynięcie).
+> Stan obecny: [02-proces.md](02-proces.md) i [07-ograniczenia.md](07-ograniczenia.md).
+
 # Proces Zakupy → Transport → Odprawa → Rozliczenie — specyfikacja w aplikacji
 
 > Dokument roboczy. Powstaje krok po kroku na podstawie `Proces_zakupyflow2.xlsx`.
