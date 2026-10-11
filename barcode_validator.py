@@ -225,8 +225,8 @@ def parse_gs1_128(raw: str) -> dict:
     Parsuje surowe dane GS1-128 (zdekodowane z kodu kreskowego lub tekstu).
 
     Obsługuje dwa formaty:
-      "(01)05900002608103(17)310510(10)LOT2025"  — z nawiasami
-      "010590000260810317310510"                  — bez nawiasów (ciągły)
+      "(01)02000002608103(17)310510(10)LOT2025"  — z nawiasami
+      "010200000260810317310510"                  — bez nawiasów (ciągły)
 
     Zwraca słownik z nazwanymi polami (gtin, lot, exp_date, prod_date, serial).
     """
@@ -244,7 +244,7 @@ def parse_gs1_128(raw: str) -> dict:
     # representation printed on medical packaging and returned by most barcode decoders.
     # GUARD: only use the fast path when there is no trailing unbracketed data after
     # the last parenthesised field.  Some decoders emit mixed formats such as
-    # "(01)05900002608103(10)LOT2025310510" where "310510" is an EXP date without
+    # "(01)02000002608103(10)LOT2025310510" where "310510" is an EXP date without
     # its "(17)" wrapper.  The regex [^(]* greedily absorbs the trailing bytes into
     # the last field's value instead of parsing them as a separate AI, silently
     # dropping the expiry date.  Detect this by comparing the total characters

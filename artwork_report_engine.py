@@ -213,7 +213,7 @@ class ArtworkReport:
 # ─── DEMO REPORT (zgodny ze zrzutami ekranu) ──────────────────────────────────
 
 def build_demo_report() -> ArtworkReport:
-    """Zwraca przykładowy raport identyczny z raportem pokazanym na zrzutach."""
+    """Zwraca przykładowy raport demonstracyjny (dane syntetyczne)."""
 
     r = ArtworkReport(
         product_code    = "DM-DEMO5-G",
@@ -232,7 +232,7 @@ def build_demo_report() -> ArtworkReport:
             filename="DM-DEMO5-G.pdf",
             role="Etykieta master (wzorzec)",
             size="300x150 mm",
-            ean="5900002608103",
+            ean="2000002608103",
             revision="1Rev.01",
             status="Wzorzec",
         ),
@@ -240,7 +240,7 @@ def build_demo_report() -> ArtworkReport:
             filename="DM-DEMO5-G_carton_sticker.pdf",
             role="Etykieta zbiorcza (fabryczna)",
             size="300x150 mm",
-            ean="5900002608103",
+            ean="2000002608103",
             revision="1Rev.00",
             status="Sprawdz",
         ),
@@ -248,7 +248,7 @@ def build_demo_report() -> ArtworkReport:
             filename="DM-DEMO5-G_pouch.pdf",
             role="Etykieta saszetki (fabryczna)",
             size="100x130 mm",
-            ean="5900002608097",
+            ean="2000002608097",
             revision="1Rev.00",
             status="Uwagi",
         ),
@@ -259,19 +259,19 @@ def build_demo_report() -> ArtworkReport:
         ReportRow("LOT", "123456789N", "— (pole puste, szablon)", "— (pole puste, szablon)", "Szablon"),
         ReportRow("Data produkcji (mfg)", "2026-05-11", "—", "—", "Szablon"),
         ReportRow("Data waznosci (exp)", "2031-05-10", "—", "—", "Szablon"),
-        ReportRow("EAN — karton (13 cyfr)", "5900002608103", "5900002608103", "—", "Zgodny"),
-        ReportRow("EAN — saszetka (13 cyfr)", "5900002608097", "—", "5900002608097", "Zgodny"),
+        ReportRow("EAN — karton (13 cyfr)", "2000002608103", "2000002608103", "—", "Zgodny"),
+        ReportRow("EAN — saszetka (13 cyfr)", "2000002608097", "—", "2000002608097", "Zgodny"),
         ReportRow("Pantone kolor 2", "PANTONE 299", "PANTONE 294", "PANTONE 294", "Niezgodnosc"),
     ]
 
     # ── 2. GS1 / UDI ──────────────────────────────────────────────────────────
     r.gs1_messages = [
         ReportMessage("OK",
-            "EAN-13 (5900002608103): Cyfra kontrolna: 3. Obliczona: 3. Poprawna."),
+            "EAN-13 (2000002608103): Cyfra kontrolna: 3. Obliczona: 3. Poprawna."),
         ReportMessage("OK",
-            "EAN-13 (5900002608097): Cyfra kontrolna: 7. Obliczona: 7. Poprawna."),
+            "EAN-13 (2000002608097): Cyfra kontrolna: 7. Obliczona: 7. Poprawna."),
         ReportMessage("OK",
-            "Kod GS1-128 (liniowy, master): (01)05900002608103 — GTIN-14 prawidlowy. "
+            "Kod GS1-128 (liniowy, master): (01)02000002608103 — GTIN-14 prawidlowy. "
             "(17)310510 — data waznosci maj 2031 zgodna z tekstem. (10)123456789N — LOT zgodny z nadrukiem."),
         ReportMessage("UWAGA",
             "DataMatrix (pouch): Brak AI 11 (data produkcji). Sprawdzic czy wymagane przez "
@@ -351,7 +351,7 @@ def build_demo_report() -> ArtworkReport:
             "Tlumaczenie medyczne wymaga 100% poprawnosci ortograficznej."),
         ReportMessage("KRYTYCZNY",
             "Dwa rozne kody GTIN na etykiecie glownej: Liniowy kod 1D = EAN kartonu "
-            "(5900002608103), prawy panel QR = EAN saszetki (5900002608097). "
+            "(2000002608103), prawy panel QR = EAN saszetki (2000002608097). "
             "Ryzyko bledu skanowania w lancuchu logistycznym."),
         ReportMessage("KRYTYCZNY",
             "Brak Pantone 292 na carton sticker: Master i pouch zawieraja PANTONE 292. "

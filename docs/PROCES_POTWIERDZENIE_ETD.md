@@ -1,3 +1,7 @@
+> **Uwaga: proces docelowy (wizja).** Ten dokument opisuje zamierzony proces. Większość
+> nie jest zaimplementowana; w kodzie jest tylko ręczne potwierdzenie wypłynięcia (`confirm-departure`).
+> Stan obecny: [02-proces.md](02-proces.md) i [07-ograniczenia.md](07-ograniczenia.md).
+
 # Proces: Potwierdzenie ETD (Chiny) → Potwierdzenie zamówienia (Radom) → Odesłanie potwierdzenia
 
 > Dokument koncepcyjny procesu (wycinek „purchasing → transport"). Służy jako punkt

@@ -17,7 +17,7 @@ Wymaga:  pip install requests
 
 Przykład (najpierw test na 40 plikach):
   python upload_masters.py --base-url https://twoja-instancja \
-      --user manager_login --root "Z:\\ISO\\WZORY ETYKIET I INSTRUKCJI" \
+      --user manager_login --root "Z:\\ARTWORK\\MASTERS" \
       --batch 20 --limit 40 --dry-run
   # potem bez --dry-run, a na końcu bez --limit
 """
@@ -72,7 +72,7 @@ def main():
     ap.add_argument("--base-url", required=True, help="np. https://twoja-instancja")
     ap.add_argument("--user", required=True, help="login managera w DocCompare")
     ap.add_argument("--password", default=None, help="hasło (lub env DC_PASSWORD / pytanie)")
-    ap.add_argument("--root", required=True, help='korzeń, np. "Z:\\ISO\\WZORY ETYKIET I INSTRUKCJI"')
+    ap.add_argument("--root", required=True, help='korzeń, np. "Z:\\ARTWORK\\MASTERS"')
     ap.add_argument("--batch", type=int, default=20, help="plików na jedno żądanie (domyślnie 20)")
     ap.add_argument("--manifest", default="uploaded_masters.json", help="plik postępu (wznawianie)")
     ap.add_argument("--limit", type=int, default=0, help="0 = bez limitu; >0 = tylko N plików (test)")

@@ -45,7 +45,7 @@ except ImportError:
 # ─── KONFIGURACJA ────────────────────────────────────────────────────────────
 # Edytuj te 3 zmienne przed pierwszym uruchomieniem:
 
-LIBRARY_ROOT = r"Z:\ISO\WZORY ETYKIET I INSTRUKCJI"
+LIBRARY_ROOT = r"Z:\ARTWORK\MASTERS"
 SERVER_URL   = "https://compare.example.com"
 SYNC_TOKEN   = "WKLEJ_TOKEN_Z_STRONY_LIBRARY"
 

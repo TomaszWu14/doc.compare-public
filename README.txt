@@ -19,10 +19,10 @@ Aplikacja dostępna na: http://localhost:5000
 Sieciowo (dla kolegów): http://[twoj-ip]:5000
 
 ## Domyślne konta
-- admin / admin123
-- superuser / super123
-- jan.kowalski / haslo123
-- anna.nowak / haslo123
+Przy pierwszym starcie (brak użytkownika admin) aplikacja tworzy konta admin, superuser,
+jan.kowalski i anna.nowak z losowymi hasłami. Hasło admina jest wypisywane w konsoli
+i zapisywane w INITIAL_ADMIN_PASSWORD.txt (usuń po pierwszym logowaniu). Hasła pozostałych
+kont ustawia admin.
 
 ## Firewall (żeby kolega mógł się połączyć)
 W PowerShell jako Administrator:

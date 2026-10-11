@@ -3,8 +3,8 @@ artwork_naming.py — parser nazw plików masterów artworków ACME.
 
 Nazwa pliku ACME koduje: REF produktu + typ opakowania + (czasem) rewizję i EAN,
 np. ``GS1710123-SS_carton_sticker.pdf`` → REF ``GS1710123-SS``, typ ``carton sticker``.
-``805016_pouch_2 Rev.00_5900010800810.pdf`` → REF ``805016``, typ ``pouch``,
-rewizja ``Rev.00``, EAN ``5900010800810``.
+``805016_pouch_2 Rev.00_2000010800810.pdf`` → REF ``805016``, typ ``pouch``,
+rewizja ``Rev.00``, EAN ``2000010800810``.
 
 Moduł jest czysty (bez zależności) i pokryty testami — używany przez bulk-upload
 masterów oraz przez lokalny uploader.
@@ -35,7 +35,7 @@ def _ean13_ok(code: str) -> bool:
     chk = (10 - (sum(d[i] * (1 if i % 2 == 0 else 3) for i in range(12)) % 10)) % 10
     return chk == d[12]
 # Rewizja: Rev.02 / Rev 2 / v3 / Ed.1 / Wyd.III (rzymskie). Bez końcowego \b,
-# bo po numerze często stoi '_' (np. "Rev.00_5900010800810") i \b by zawiódł.
+# bo po numerze często stoi '_' (np. "Rev.00_2000010800810") i \b by zawiódł.
 # Uwaga: gałąź samego 'v<n>' wymaga POPRZEDZAJĄCEJ SPACJI (?<=\s), a nie tylko
 # granicy słowa \b — inaczej wariant kodu produktu po myślniku (np. "NL753-V40")
 # zostałby błędnie zinterpretowany jako rewizja "V40", korumpując REF i ranking.

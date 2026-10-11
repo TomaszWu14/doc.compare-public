@@ -4,7 +4,7 @@ function App() {
   return (
     <DesignCanvas
       title="ArtCompare · raport porównania artworków opakowań"
-      subtitle="5 wariantów · case: ZAY-easyCARE(200)-BNPFE-260320 v1.4 → v1.5">
+      subtitle="5 wariantów · case: ACM-AcmeCare(200)-BNPFE-260320 v1.4 → v1.5">
 
       <DCSection
         id="paper"

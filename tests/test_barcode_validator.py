@@ -26,16 +26,16 @@ class TestValidateEAN13:
         assert result["error"] is not None
 
     def test_too_short(self):
-        result = validate_ean13("590000180134")
+        result = validate_ean13("200000180134")
         assert result["valid"] is False
 
     def test_too_long(self):
-        result = validate_ean13("59000018013440")
+        result = validate_ean13("20000018013440")
         # 14 digits — GTIN-14 with indicator != 0 or stripped to EAN-13
         assert "valid" in result
 
     def test_non_digits(self):
-        result = validate_ean13("590000180134X")
+        result = validate_ean13("200000180134X")
         assert result["valid"] is False
 
     def test_empty(self):
@@ -53,7 +53,7 @@ class TestParseGS1128:
     """parse_gs1_128() returns a dict with 'gtin', 'lot', 'exp_date', etc."""
 
     def test_gtin_ai(self):
-        result = parse_gs1_128("(01)05900001801344")
+        result = parse_gs1_128("(01)02000001801344")
         assert result is not None
         assert result.get("gtin") is not None
 
@@ -68,7 +68,7 @@ class TestParseGS1128:
         assert result.get("exp_date") is not None
 
     def test_combined(self):
-        result = parse_gs1_128("(01)05900001801344(10)LOT001(17)251231")
+        result = parse_gs1_128("(01)02000001801344(10)LOT001(17)251231")
         assert result is not None
         assert result.get("gtin") is not None
         assert result.get("lot") is not None
@@ -82,14 +82,14 @@ class TestParseGS1128:
     def test_continuous_recovers_exp_after_variable_lot(self):
         # Format ciągły bez nawiasów: GTIN(01,14) + LOT(10,zmienna) + EXP(17,6).
         # Wcześniej skaner zjadał LOT za daleko i gubił datę ważności.
-        result = parse_gs1_128("01" + "05900002608103" + "10ABC" + "17" + "310510")
-        assert result.get("gtin") == "05900002608103"
+        result = parse_gs1_128("01" + "02000002608103" + "10ABC" + "17" + "310510")
+        assert result.get("gtin") == "02000002608103"
         assert result.get("lot") == "ABC"
         assert result.get("exp_date") == "2031-05-10"
 
     def test_continuous_fixed_then_variable_last(self):
         # GTIN(14) + EXP(17,6) + LOT(zmienna, ostatnia) — data nie ginie.
-        result = parse_gs1_128("01" + "05900002608103" + "17" + "310510" + "10XYZ")
-        assert result.get("gtin") == "05900002608103"
+        result = parse_gs1_128("01" + "02000002608103" + "17" + "310510" + "10XYZ")
+        assert result.get("gtin") == "02000002608103"
         assert result.get("exp_date") == "2031-05-10"
         assert result.get("lot", "").startswith("XYZ")

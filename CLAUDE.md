@@ -53,10 +53,10 @@ ruff format .
 
 | Username | Password | Role |
 |---|---|---|
-| admin | admin123 | admin |
-| superuser | super123 | superuser |
-| jan.kowalski | haslo123 | user |
-| anna.nowak | haslo123 | manager |
+| admin | random — printed to the console and written to `INITIAL_ADMIN_PASSWORD.txt` (gitignored) | admin |
+| superuser | random, not shown — reset it as admin | superuser |
+| jan.kowalski | random, not shown — reset it as admin | user |
+| anna.nowak | random, not shown — reset it as admin | manager |
 
 The login form field is `identifier` (accepts username **or** email).
 

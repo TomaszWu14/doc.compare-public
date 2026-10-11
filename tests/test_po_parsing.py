@@ -20,11 +20,11 @@ def _db(materials=None):
 
 # ── Ścieżka master daty (najdłuższy znany REF jako prefiks) ──────────────────
 def test_master_match_strips_description():
-    db = _db(["RNBS10001"])
-    ref, opis = clean_po_ref(db, "RNBS10001 easyCARE nitrile gloves S")
-    assert ref == "RNBS10001"
+    db = _db(["ACGS10001"])
+    ref, opis = clean_po_ref(db, "ACGS10001 AcmeCare nitrile gloves S")
+    assert ref == "ACGS10001"
     # gdy opis nie podany — całość trafia do opisu (zachowujemy oryginał)
-    assert "easyCARE" in opis
+    assert "AcmeCare" in opis
 
 
 def test_master_match_with_separators_in_ref():
@@ -35,15 +35,15 @@ def test_master_match_with_separators_in_ref():
 
 
 def test_master_match_prefers_longest_ref():
-    db = _db(["RN", "RNBS10001"])
-    ref, _ = clean_po_ref(db, "RNBS10001 opis")
-    assert ref == "RNBS10001"
+    db = _db(["RN", "ACGS10001"])
+    ref, _ = clean_po_ref(db, "ACGS10001 opis")
+    assert ref == "ACGS10001"
 
 
 def test_master_match_keeps_explicit_opis():
-    db = _db(["RNBS10001"])
-    ref, opis = clean_po_ref(db, "RNBS10001 sklejony", opis="właściwy opis")
-    assert ref == "RNBS10001"
+    db = _db(["ACGS10001"])
+    ref, opis = clean_po_ref(db, "ACGS10001 sklejony", opis="właściwy opis")
+    assert ref == "ACGS10001"
     assert opis == "właściwy opis"
 
 
@@ -85,6 +85,6 @@ def test_ref_truncated_to_50_chars():
 
 
 def test_whitespace_stripped():
-    db = _db(["RNBS10001"])
-    ref, _ = clean_po_ref(db, "  RNBS10001 opis  ")
-    assert ref == "RNBS10001"
+    db = _db(["ACGS10001"])
+    ref, _ = clean_po_ref(db, "  ACGS10001 opis  ")
+    assert ref == "ACGS10001"

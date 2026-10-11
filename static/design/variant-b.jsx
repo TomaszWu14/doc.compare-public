@@ -154,14 +154,14 @@ function BLeftRail({ selected }) {
         </div>
       </div>
       <div style={{padding:'2px 12px', overflowY:'auto', flex: 1}}>
-        <HistRow id="#08" sku="ZAY-easyCARE(200)" date="20.05" status="crit" current />
-        <HistRow id="#07" sku="ZAY-easyCARE(100)" date="14.05" status="warn" />
-        <HistRow id="#06" sku="ZAY-COMFIT(50)"    date="11.05" status="ok" />
-        <HistRow id="#05" sku="ZAY-MEDISORB"      date="08.05" status="ok" />
-        <HistRow id="#04" sku="ZAY-easyCARE(500)" date="02.05" status="warn" />
-        <HistRow id="#03" sku="ZAY-DERMO-PRO"     date="28.04" status="crit" />
-        <HistRow id="#02" sku="ZAY-COMFIT(200)"   date="22.04" status="ok" />
-        <HistRow id="#01" sku="ZAY-easyCARE(50)"  date="18.04" status="ok" />
+        <HistRow id="#08" sku="ACM-AcmeCare(200)" date="20.05" status="crit" current />
+        <HistRow id="#07" sku="ACM-AcmeCare(100)" date="14.05" status="warn" />
+        <HistRow id="#06" sku="ACM-COMFIT(50)"    date="11.05" status="ok" />
+        <HistRow id="#05" sku="ACM-MEDISORB"      date="08.05" status="ok" />
+        <HistRow id="#04" sku="ACM-AcmeCare(500)" date="02.05" status="warn" />
+        <HistRow id="#03" sku="ACM-DERMO-PRO"     date="28.04" status="crit" />
+        <HistRow id="#02" sku="ACM-COMFIT(200)"   date="22.04" status="ok" />
+        <HistRow id="#01" sku="ACM-AcmeCare(50)"  date="18.04" status="ok" />
       </div>
 
       <div style={{

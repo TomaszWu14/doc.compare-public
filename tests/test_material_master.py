@@ -17,7 +17,7 @@ def test_upsert_and_lookup():
     db = _db()
     rows = [
         {"ref_code": "NL753-S-40", "opis_pl": "Cewnik", "opis_en": "Catheter",
-         "ean": "5900010800810", "karton_wymiar": "520 x 380 x 300 mm"},
+         "ean": "2000010800810", "karton_wymiar": "520 x 380 x 300 mm"},
         {"ref_code": "", "opis_pl": "pusty"},
     ]
     res = mm.upsert_materials(db, rows)
@@ -39,10 +39,10 @@ def test_upsert_is_idempotent_update():
 
 def test_validate_items():
     db = _db()
-    mm.upsert_materials(db, [{"ref_code": "R1", "ean": "5900010800810"}])
+    mm.upsert_materials(db, [{"ref_code": "R1", "ean": "2000010800810"}])
     warns = mm.validate_items(
         db,
-        [{"ref": "R1", "ean_a": "5900010800810"},   # ok
+        [{"ref": "R1", "ean_a": "2000010800810"},   # ok
          {"ref": "UNK"},                              # unknown
          {"ref": "R1", "ean_a": "1111111111111"}],    # ean mismatch
         "ref", "ean_a",
@@ -73,14 +73,14 @@ def test_bare_ean_under_banner_is_level_not_global():
     db = _db()
     rows = [['', 'KAR'],
             ['ref_code', 'ean'],
-            ['E1', '5900010800810']]
+            ['E1', '2000010800810']]
     mm.import_workbook(db, rows)
     m = mm.get_material(db, 'E1')
     import json
     levels = json.loads(m['levels_json'])
     # 'ean' pod bannerem KAR → poziom kartonu, nie globalny EAN materiału
     assert m['ean'] == ''
-    assert levels.get('karton', {}).get('ean') == '5900010800810'
+    assert levels.get('karton', {}).get('ean') == '2000010800810'
 
 
 def test_two_row_header_with_converters():
@@ -93,7 +93,7 @@ def test_two_row_header_with_converters():
          'karton_ean', 'Ilość podstawowej jednostki miary',
          'Ilość podstawowej jednostki miary PAZ', 'Ilość podstawowej jednostki miary PPA'],
         ['R-1', 'Opis', 'Desc', 'SZT', 'PROD-9',
-         '5900010800810', '1', '5900010800018', '12', '5900010800025', '240', '4800', '2400'],
+         '2000010800810', '1', '2000010800018', '12', '2000010800025', '240', '4800', '2400'],
     ]
     res = mm.import_workbook(db, rows)
     assert res['imported'] == 1

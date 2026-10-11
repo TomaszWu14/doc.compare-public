@@ -43,7 +43,7 @@ function EMailChrome() {
         fontFamily:"'Newsreader', serif", fontWeight: 500,
         fontSize: 28, letterSpacing:'-.01em', lineHeight: 1.15,
       }}>
-        Re: <span style={{fontStyle:'italic', color:'var(--ink-2)'}}>easyCARE 200 · gaziki sterylne</span>
+        Re: <span style={{fontStyle:'italic', color:'var(--ink-2)'}}>AcmeCare 200 · gaziki sterylne</span>
         <br/>
         <span style={{color:'var(--critical)'}}>5 krytycznych</span> rozbieżności w v1.5
       </h1>
@@ -52,14 +52,14 @@ function EMailChrome() {
         <div>ArtCompare &lt;artcompare@example.com&gt;</div>
         <div style={{color:'var(--ink-3)'}}>Do</div>
         <div>
-          <Chip name="J. Zielińska · QA Lead" />
-          <Chip name="A. Kowalska · Brand" />
-          <Chip name="P. Wojtas · Regulatory" />
+          <Chip name="E. Lis · QA Lead" />
+          <Chip name="O. Sowa · Brand" />
+          <Chip name="R. Kos · Regulatory" />
         </div>
         <div style={{color:'var(--ink-3)'}}>DW</div>
         <div>
-          <Chip name="M. Nowak · PrintHub Wuhan (dostawca)" />
-          <Chip name="T. Bąk · DTP" />
+          <Chip name="B. Jeż · PrintHub Wuhan (dostawca)" />
+          <Chip name="D. Wilk · DTP" />
         </div>
         <div style={{color:'var(--ink-3)'}}>Załączniki</div>
         <div style={{display:'flex', gap: 8, flexWrap:'wrap'}}>

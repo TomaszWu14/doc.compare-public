@@ -45,7 +45,7 @@
   <div class="ai-box">
     <h3>① Najszybciej: import listy ścieżek z Z:\</h3>
     <p>Na komputerze z dostępem do Z:\ uruchom w wierszu poleceń (jeden plik na linię):</p>
-    <p><code>dir /s /b "Z:\ISO\WZORY ETYKIET I INSTRUKCJI\*.pdf" &gt; lista_artworkow.txt</code></p>
+    <p><code>dir /s /b "Z:\ARTWORK\MASTERS\*.pdf" &gt; lista_artworkow.txt</code></p>
     <p>…i wgraj <code>lista_artworkow.txt</code> tutaj (akceptuje też .csv/.xlsx z kolumną ścieżek). Wysyłane są tylko nazwy i ścieżki — bez treści plików.</p>
     <label class="btn btn-sm btn-primary" style="cursor:pointer;margin-top:6px">⬆ Wgraj listę ścieżek
       <input type="file" accept=".txt,.csv,.xlsx" style="display:none" @change="doImport($event)"></label>
@@ -55,14 +55,14 @@
   <div class="ai-box">
     <h3>② Automatycznie (cyklicznie): skaner agenta</h3>
     <p>Na maszynie ACME (widzi Z:\), z Pythonem + <code>pip install requests</code>:</p>
-    <p><code>python tools/scan_artwork_index.py --base-url {{ request.url_root.rstrip('/') }} --user &lt;login_managera&gt; --root "Z:\ISO\WZORY ETYKIET I INSTRUKCJI"</code></p>
+    <p><code>python tools/scan_artwork_index.py --base-url {{ request.url_root.rstrip('/') }} --user &lt;login_managera&gt; --root "Z:\ARTWORK\MASTERS"</code></p>
     <p>Dodaj do Harmonogramu zadań Windows (np. co godzinę), by indeks był zawsze aktualny — nowe rewizje pojawią się automatycznie.</p>
   </div>
   {% endif %}
 
   <div class="ai-box">
     <h3>Jak działa dobór master↔REF</h3>
-    <p>Po zasileniu indeksu: REF z pozycji PO → (1) dokładne dopasowanie po nazwie/<code>ref_norm</code> → (2) alias nazwa-pliku→REF → (3) propozycje po opisie materiału (gdy nazwa nie zawiera REF, np. <code>easycare_nitrile_carton_S_a100</code> = RNBS10001). Powiązania edytujesz w <a href="/artwork/aliases" target="_blank">Aliasach</a>.</p>
+    <p>Po zasileniu indeksu: REF z pozycji PO → (1) dokładne dopasowanie po nazwie/<code>ref_norm</code> → (2) alias nazwa-pliku→REF → (3) propozycje po opisie materiału (gdy nazwa nie zawiera REF, np. <code>acmecare_nitrile_carton_S_a100</code> = ACGS10001). Powiązania edytujesz w <a href="/artwork/aliases" target="_blank">Aliasach</a>.</p>
   </div>
 </div>
 
