@@ -68,8 +68,8 @@
 
 ## BLOK B — TRANSPORT (kroki 9–19)
 
-### Krok 9 — Lista ETD od Marci (Oddział Chiny) vs SAP
-- **Marcia wpisuje ETD wprost do Kolejki** (Oddział Chiny = użytkownik apki). Excel znika.
+### Krok 9 — Lista ETD od Oddziału Chiny vs SAP
+- **Oddział Chiny wpisuje ETD wprost do Kolejki** (Oddział Chiny = użytkownik apki). Excel znika.
 - Apka porównuje ETD z kostką SAP BW → **alert + lista braków** ETD do uzupełnienia.
 
 ### Krok 10 — Tygodniowa lista do specjalistów ⭐ (serce wspólnego pola)
@@ -79,7 +79,7 @@
   - **Planowane ETD**
   - **Uwagi / priorytet**
 - **Zgoda na wypłynięcie** zatwierdzana tylko przez rolę **„specjalista"** (zapis kto+kiedy).
-- Łańcuch maili (Marcia→Asystenci→Specjalista→Transport) zastąpiony wspólnym widokiem.
+- Łańcuch maili (Oddział Chiny→Asystenci→Specjalista→Transport) zastąpiony wspólnym widokiem.
 
 ### Krok 11 — Wysyłka zleceń do spedycji
 - Apka **generuje zlecenie spedycyjne** z zatwierdzonych PO (tylko ze zgodą na wypłynięcie).
@@ -173,7 +173,7 @@
 - **Asystenci Zakupów** — tworzą PO, wgrywają dokumenty, przypisują 18\*\*\*\*↔kontener.
 - **Specjalista** — jedyny może zatwierdzić „zgodę na wypłynięcie" (krok 10).
 - **Transport** — spedycja, FO, tracking, harmonogram, rozliczenie frachtu.
-- **Oddział Chiny (Marcia)** — wpisuje ETD do Kolejki (krok 9).
+- **Oddział Chiny** — wpisuje ETD do Kolejki (krok 9).
 - **Magazyn** — potwierdza dostawę w apce (krok 22).
 - **Księgowość** — odbiera zestawy dokumentów, rozliczenia.
 
