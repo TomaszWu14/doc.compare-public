@@ -1,7 +1,7 @@
 {
   "_opis": "Scenariusz trybu prezentacji (?demo=1). 'text' to napisy i tekst lektora; przed wysłaniem do ElevenLabs generator podmienia słowa ze słownika 'wymowa'. 'url' przy kroku = strona pokazywana od tego kroku. action: navigate | highlight | click.",
   "wymowa": {
-    "DocCompare": "Dok Kompar",
+    "DocCompare": "Doc Compare",
     "PDF": "pe-de-ef",
     "EAN": "e-an",
     "REF": "ref",
