@@ -278,6 +278,8 @@ in `static/design/` (excluded from lint).
 ## Deployment
 
 The original setup deployed `main` to Coolify on Hetzner (see `docs/DOKUMENTACJA_IT.md`);
-this portfolio copy has no deploy workflow.
+this portfolio copy deploys a demo (https://doc.compare.twapp.pl) via
+`.github/workflows/deploy.yml` — after green CI on `main` it calls the Coolify deploy API
+(secret `COOLIFY_TOKEN`).
 Gunicorn runs via `gunicorn.conf.py`; `Dockerfile` is available for container builds. Health
 check path is `/login`. Sentry and Resend are optional, configured via env vars.

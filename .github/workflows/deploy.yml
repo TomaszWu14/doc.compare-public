@@ -1,0 +1,33 @@
+name: Deploy — demo (Coolify)
+
+# Po zielonym CI na main zleca Coolify przebudowę demo
+# (https://doc.compare.twapp.pl). Zmiany tylko w *.md / docs/ nie uruchamiają
+# CI, więc nie wdrażają się — demo ich nie potrzebuje.
+#
+# Sekret COOLIFY_TOKEN: token API Coolify z uprawnieniem "deploy".
+
+on:
+  workflow_run:
+    workflows: ["CI — testy jednostkowe"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-demo
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Coolify deploy
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+        run: |
+          curl -fsS --max-time 30 \
+            -H "Authorization: Bearer $COOLIFY_TOKEN" \
+            "https://coolify.twapp.pl/api/v1/deploy?uuid=h48sw55svsszr3fx0qgd0scl&force=false"
