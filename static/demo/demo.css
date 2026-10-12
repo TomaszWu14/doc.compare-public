@@ -1,0 +1,54 @@
+/* Tryb prezentacji (?demo=1) — ładowany tylko z parametrem, więc bez niego
+   nie wpływa na wygląd aplikacji. */
+.dc-demo-open, .dc-demo-open body { overflow: hidden; }
+
+.dc-demo-start {
+  position: fixed; right: 24px; bottom: 24px; z-index: 2147483000;
+  padding: 14px 22px; border: 0; border-radius: 999px;
+  font: 600 15px/1 system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #fff; background: #2563eb; cursor: pointer;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, .45);
+}
+.dc-demo-start:hover { background: #1d4ed8; }
+.dc-demo-start:focus-visible, .dc-demo-btn:focus-visible { outline: 3px solid #f59e0b; outline-offset: 2px; }
+.dc-demo-start:disabled { opacity: .6; cursor: progress; }
+
+.dc-demo {
+  position: fixed; inset: 0; z-index: 2147483000;
+  display: flex; flex-direction: column; background: #0f172a;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.dc-demo-frame { flex: 1; width: 100%; border: 0; background: #fff; }
+
+.dc-demo-subs {
+  position: absolute; left: 50%; bottom: 76px; transform: translateX(-50%);
+  width: min(920px, calc(100% - 32px)); padding: 14px 20px;
+  border-radius: 12px; background: rgba(15, 23, 42, .88); color: #f8fafc;
+  font-size: 18px; line-height: 1.5; text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, .35); pointer-events: none;
+}
+.dc-demo-subs:empty { display: none; }
+
+.dc-demo-track { height: 4px; background: #1e293b; }
+.dc-demo-bar { height: 100%; width: 0; background: #f59e0b; transition: width .25s linear; }
+
+.dc-demo-panel {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 16px; background: #0f172a; color: #cbd5e1;
+}
+.dc-demo-btn {
+  min-width: 40px; height: 40px; padding: 0 10px; border: 1px solid #334155;
+  border-radius: 10px; background: #1e293b; color: #f8fafc; font-size: 16px; cursor: pointer;
+}
+.dc-demo-btn:hover:not(:disabled) { background: #334155; }
+.dc-demo-btn:disabled { opacity: .4; cursor: default; }
+.dc-demo-vol { width: 110px; accent-color: #f59e0b; }
+.dc-demo-count { margin-left: auto; font-variant-numeric: tabular-nums; font-size: 14px; }
+
+@media (max-width: 600px) {
+  .dc-demo-subs { font-size: 15px; bottom: 120px; }
+  .dc-demo-vol { width: 80px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dc-demo-bar { transition: none; }
+}
