@@ -1,0 +1,5 @@
+{# Tryb prezentacji z lektorem — tylko z ?demo=1; bez parametru nic nie dokłada. #}
+{% if request.args.get('demo') == '1' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='demo/demo.css') }}">
+<script defer src="{{ url_for('static', filename='demo/demo.js') }}"></script>
+{% endif %}

@@ -1,0 +1,84 @@
+{
+  "_opis": "Scenariusz trybu prezentacji (?demo=1). 'text' to napisy i tekst lektora; przed wysłaniem do ElevenLabs generator podmienia słowa ze słownika 'wymowa'. 'url' przy kroku = strona pokazywana od tego kroku. action: navigate | highlight | click.",
+  "wymowa": {
+    "DocCompare": "Dok Kompar",
+    "PDF": "pe-de-ef",
+    "EAN": "e-an",
+    "REF": "ref",
+    "API": "a-pe-i",
+    "SAP": "es-a-pe",
+    "GitHubie": "Githabie"
+  },
+  "steps": [
+    {
+      "id": "krok01",
+      "action": "navigate",
+      "url": "/home",
+      "text": "DocCompare porządkuje import wyrobów medycznych. Jedna dostawa z Chin to pięć dokumentów: zamówienie, proforma, faktura, lista pakowa i zgłoszenie celne. Wcześniej zespół porównywał je ręcznie, linia po linii."
+    },
+    {
+      "id": "krok02",
+      "action": "navigate",
+      "url": "/compare",
+      "selector": "#za",
+      "text": "Zaczynamy od porównania. Tu wgrywamy zamówienie, a obok proformę dostawcy. Aplikacja czyta tabele z PDF i dopasowuje pozycje, nawet gdy dostawca inaczej zapisuje kody."
+    },
+    {
+      "id": "krok03",
+      "action": "highlight",
+      "selector": "#btnRun",
+      "text": "Po kliknięciu Analizuj dostajemy listę różnic. Zielony wiersz się zgadza, czerwony nie. Na przykład: zamówiliśmy osiemset sztuk, a proforma mówi siedemset pięćdziesiąt."
+    },
+    {
+      "id": "krok04",
+      "action": "navigate",
+      "url": "/suppliers",
+      "selector": "#supGrid",
+      "text": "O tym, co jest błędem, decydują profile dostawców. Każdy ma własne mapowanie kolumn i tolerancję ceny, na przykład pół procenta. Te same reguły dają zawsze ten sam wynik."
+    },
+    {
+      "id": "krok05",
+      "action": "navigate",
+      "url": "/dostawy",
+      "selector": "[x-data=\"dostawyApp()\"] > div:first-child",
+      "text": "Wynik porównania trafia na kartę dostawy. Kafelki pokazują, na którym etapie jest każda dostawa. Z niezgodnością dostawa nie przejdzie dalej, chyba że ktoś nadpisze status, z uzasadnieniem."
+    },
+    {
+      "id": "krok06",
+      "action": "navigate",
+      "url": "/checklists",
+      "selector": "#pane-deliveries",
+      "text": "Przed odprawą aplikacja sprawdza komplet dokumentów. Faktura, lista pakowa, konosament i zgłoszenie celne muszą być zatwierdzone."
+    },
+    {
+      "id": "krok07",
+      "action": "click",
+      "selector": "#tab-templates",
+      "text": "Wymagane dokumenty definiujemy w szablonach, osobno dla każdego dostawcy. Nowy dostawca to nowy szablon, bez zmian w kodzie."
+    },
+    {
+      "id": "krok08",
+      "action": "navigate",
+      "url": "/artwork/report",
+      "selector": ".section",
+      "text": "Drugi obszar to opakowania. Raport porównuje etykietę wzorcową z wersjami z fabryki. Sprawdza kody EAN, numery REF i rewizje."
+    },
+    {
+      "id": "krok09",
+      "action": "click",
+      "selector": "#lvlUproszcz",
+      "text": "Widok uproszczony zostawia tylko błędy. Tak raport czyta osoba, która zatwierdza druk."
+    },
+    {
+      "id": "krok10",
+      "action": "navigate",
+      "url": "/home",
+      "text": "Sztuczna inteligencja dostaje wynik dopiero na końcu. Ocenia ryzyko i podpowiada mapowanie kolumn, ale niczego nie zmienia sama. Propozycje zatwierdza manager, a aplikacja działa też bez klucza do API."
+    },
+    {
+      "id": "krok11",
+      "action": "highlight",
+      "text": "Aplikacja nie podejmuje decyzji za człowieka i nie łączy się z SAP. Blokuje i pokazuje różnicę. Kod i dokumentacja analityczna są na GitHubie. Dziękuję za uwagę."
+    }
+  ]
+}
