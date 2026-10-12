@@ -72,6 +72,11 @@ COPY . .
 
 EXPOSE 5000
 
+# curl is purged above, so probe /login with the stdlib. start-period covers
+# migrate_db.py + gunicorn boot; Coolify/Traefik read this as container health.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/login', timeout=4)" || exit 1
+
 # Migration runs at container start so it targets the runtime DB path
 # (which may be on a persistent mounted volume, not available at build time).
 # Workers: 2 × 3 threads — each worker loads its own model copy (~2 GB),
