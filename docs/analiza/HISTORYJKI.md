@@ -10,6 +10,7 @@
 ### US-001 · Rola managera na endpointach szablonów PalViz
 **Jako** administrator **chcę**, aby analiza i zapis szablonów wykrojników wymagały roli `manager`, **aby** zwykły użytkownik nie zmieniał danych referencyjnych.
 Wymaganie: SEC-005. Ryzyko: R-01 (🟠). Typ: security. Dowód: `blueprints/palviz.py:236, 287`.
+**Status: zrealizowane w PR #11** (commit `security(palviz)`), czeka na akceptację PO.
 
 ```gherkin
 Given zalogowany użytkownik z rolą user

@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | SEC-013, NFR-013 | US-005, US-017 | `.github/workflows/ci.yml`, `security.yml` (sam CI) | #11 | w przeglądzie |
 | — (proces) | US-016 | `tests/test_hosting_docs.py` (istniejący strażnik dokumentów) — do rozszerzenia o `CONTRIBUTING.md`/`SECURITY.md` | #11 | w przeglądzie |
-| SEC-005 | US-001 | planowany `tests/test_palviz_roles.py::test_SEC005_templates_require_manager` + strażnik `test_no_require_role_as_bool` | — | do realizacji |
+| SEC-005 | US-001 | `tests/test_palviz_roles.py` — 8 testów: user/forwarder → 403 bez zapisu, anonim → login, manager → 200/400, brak CSRF → 403, strażnik `test_SEC005_require_role_only_used_as_decorator` | #11 | w przeglądzie (odbiór BA ✅, SEC ✅) |
 | SEC-009 | US-002 | planowany `tests/test_settings_encryption.py` | — | do realizacji |
 | SEC-015 | US-003 | planowany `tests/test_auth_blueprint.py::test_SEC015_reset_link_uses_app_base_url` | — | do realizacji |
 | SEC-016 | US-004 | planowany `tests/test_artwork_report_access.py` | — | do realizacji |

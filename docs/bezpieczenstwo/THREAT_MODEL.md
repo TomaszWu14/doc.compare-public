@@ -121,7 +121,7 @@ integralność statusów dostawy (bramki), sekrety integracji, dostępność apl
 |---|---|---|---|
 | I: odczyt kluczy z bazy/backupu | — | klucze API/SMS/Anthropic jawnym tekstem w `settings` 🟡 | US-002 |
 | E: manager zapisuje klucze | `require_role("manager")` | zapis sekretów powinien być tylko dla admina 🟡 | US-002 |
-| E: `require_role` jako wartość logiczna | — | `blueprints/palviz.py:236, 287` 🟠 | US-001 |
+| E: `require_role` jako wartość logiczna | dekorator `@require_role("manager")` + strażnik AST w testach (PR #11) | — ✅ po merge | US-001 |
 | T: usunięcie ostatniego admina | blokada | — ✅ | — |
 | R: zmiany konfiguracji bez śladu | `audit_log` w części tras | przegląd per trasa ⚪ | US-023 |
 
@@ -146,7 +146,7 @@ integralność statusów dostawy (bramki), sekrety integracji, dostępność apl
 
 | Waga | Liczba | Historyjki |
 |---|---|---|
-| 🟠 | 1 | US-001 |
+| 🟠 | 0 (1 naprawione w PR #11, zamknięcie po merge) | US-001 |
 | 🟡 | 11 | US-002, US-003, US-004, US-006, US-007, US-025, US-026 |
 | ⚪ | 13 | US-027, US-023, US-020, decyzje PO |
 

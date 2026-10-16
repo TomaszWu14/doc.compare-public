@@ -101,3 +101,9 @@ pre-commit install            # ruff, gitleaks, końce linii, duże pliki
 | `docs/testy/`, `docs/operacje/` | DEV | strategia testów, runbook |
 | `docs/AUDYT.md` | wszyscy | audyt otwierający (2026-10-15) |
 | `docs/01…07-*.md`, `docs/*.md` | historyczne | analiza z 2026-10, runbook IT, backup, kolejkowanie, plan refaktoru — nadal aktualne jako źródła |
+
+## 8. Wzorce zakazane (strażniki w testach)
+
+| Wzorzec | Dlaczego | Strażnik |
+|---|---|---|
+| `if not require_role("…")` / dowolne użycie `require_role(...)` poza dekoratorem | `require_role` to fabryka dekoratorów; jako wartość logiczna jest zawsze prawdziwa i nie sprawdza roli (R-01) | `tests/test_palviz_roles.py::test_SEC005_require_role_only_used_as_decorator` |

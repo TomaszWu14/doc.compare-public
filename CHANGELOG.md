@@ -19,9 +19,13 @@ Wersja aplikacji: `constants.APP_VERSION`.
 - Pre-commit: gitleaks, kontrola końców linii, dużych plików, YAML i kluczy prywatnych.
 
 ### Changed
+- `tests/conftest.py`: konto testowe `it_user` i fixture `user_client` (testy „brak dostępu” dla najniższej roli).
 - `security.yml` uruchamia się także na PR i pushu do `main` (dotąd tylko co miesiąc); Python 3.11 jak w produkcji.
 
 ### Security
+- **US-001 / R-01:** endpointy kreatora szablonów wykrojników PalViz (`/api/artwork/templates/analyze`, `/save`)
+  wymagają roli `manager`. Wcześniej `if not require_role(...)` nigdy nie sprawdzał roli, więc każdy zalogowany
+  użytkownik mógł analizować i zapisywać szablony. Dodany strażnik w testach: `require_role()` tylko jako dekorator.
 - `tools/generate_voiceover.py`: SHA1 oznaczony jako nie-kryptograficzny (`usedforsecurity=False`), stały adres
   https w `urlopen` opisany adnotacją Bandit — bramka SAST bez ustaleń ≥ MEDIUM.
 

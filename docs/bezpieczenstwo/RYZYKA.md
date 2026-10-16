@@ -7,7 +7,7 @@
 
 | ID | Ryzyko | Wpływ | Prawd. | Ocena | Dowód | Decyzja / plan | Właściciel | Przegląd |
 |---|---|---|---|---|---|---|---|---|
-| R-01 | Endpointy szablonów PalViz dostępne dla każdego zalogowanego (`require_role` jako bool) | 2 | 3 | **6 🟠** | `blueprints/palviz.py:236, 287` | naprawa US-001 (Sprint 1) | DEV | po merge |
+| R-01 | Endpointy szablonów PalViz dostępne dla każdego zalogowanego (`require_role` jako bool) | 2 | 3 | **6 🟠** | `blueprints/palviz.py:236, 287` | **naprawione w PR #11** (dekorator + 8 testów + strażnik statyczny); zamknięcie po merge | DEV | po merge |
 | R-02 | Klucze API/SMS/Anthropic jawnym tekstem w `settings`, zapis przez managera, token SMSAPI w URL | 3 | 2 | **6 🟡** | `app.py:16005, 17167, 8526, 17234` | naprawa US-002 | DEV/SEC | 2026-11-30 |
 | R-03 | Link resetu hasła z nagłówka Host przy braku `APP_BASE_URL` | 3 | 1 | 3 🟡 | `blueprints/auth.py:303`, `app.py:110` | naprawa US-003; do tego czasu `APP_BASE_URL` ustawione na demo (do sprawdzenia) | DEV | 2026-11-30 |
 | R-04 | Raport artworku bez właściciela dostępny po identyfikatorze (fail-open) | 2 | 1 | 2 🟡 | `app.py:7590, 7671, 8097` | naprawa US-004 | DEV | 2026-11-30 |
