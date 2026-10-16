@@ -33,6 +33,7 @@
 | E-05 | CSP z `unsafe-inline`/`unsafe-eval` | `app.py:242-249` | 15 tys. linii inline JS; przejście na nonce to osobna historyjka | R-05 | 2026-12-31 | do potwierdzenia |
 | E-06 | `check_session_active` fail-open przy awarii bazy | `core/security.py:66-69` | świadoma decyzja: awaria bazy nie wylogowuje wszystkich; inne błędy fail-closed | — | przy zmianie | zapisane w kodzie |
 | E-07 | Hasła pbkdf2:sha256 zamiast argon2/bcrypt | `blueprints/auth.py` | werkzeug domyślnie; migracja wymaga rehash przy logowaniu | — | 2026-12-31 | do decyzji PO |
+| E-08 | Fałszywy alarm gitleaks `generic-api-key` w `tests/test_palviz_roles.py` (pole `sig_key` z syntetyczną sygnaturą szablonu) | `.gitleaksignore` (fingerprint commita `a96ec35`) | wartość nie jest sekretem; w kolejnym commicie zmieniona na mniej podobną do klucza | — | przy zmianie pliku | n/d |
 
 ## 3. Zamknięte
 

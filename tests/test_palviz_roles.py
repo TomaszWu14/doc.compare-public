@@ -25,7 +25,7 @@ SAVE = "/api/artwork/templates/save"
 
 _SAVE_PAYLOAD = {
     "name": "test-SEC005",
-    "sig_key": "sec005-signature",
+    "sig_key": "sec-sec-sec",  # syntetyczna sygnatura szablonu, nie sekret
     "page_w_mm": 300,
     "page_h_mm": 200,
     "regions": {"front": [0.1, 0.1, 0.4, 0.4]},

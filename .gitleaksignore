@@ -1,0 +1,6 @@
+# Fałszywe alarmy gitleaks — każdy z uzasadnieniem (polityka: docs/bezpieczenstwo/RYZYKA.md, sekcja „Wyjątki”).
+# Format: <commit>:<plik>:<reguła>:<linia> (fingerprint z raportu gitleaks).
+#
+# E-08 (2026-10-16): "sig_key": "sec005-signature" w teście US-001 — syntetyczna sygnatura
+# szablonu wykrojnika (pole API `sig_key`), nie sekret; reguła generic-api-key reaguje na „key”.
+a96ec3570bfb70a757cf20aa79897b3b92f5bbef:tests/test_palviz_roles.py:generic-api-key:28
