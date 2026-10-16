@@ -6246,6 +6246,28 @@ def _cache_get_owner(cache_id: str):
             return entry[2] if len(entry) > 2 else None
     return None
 
+
+def _artwork_access_allowed(owner_id, is_public=False, *, uid=None, role=None) -> bool:
+    """US-004 / SEC-016: jedna reguła dostępu do raportów i wyników artworków po cache_id.
+
+    Fail-closed: wpis bez właściciela widzi tylko superuser/admin. Dostęp mają: właściciel,
+    każdy przy raporcie publicznym, oraz role `can_see_all`. Domyślnie uid/rola z sesji.
+    """
+    if uid is None and role is None:
+        uid, role = session.get("user_id"), session.get("role", "")
+    if can_see_all(role or ""):
+        return True
+    if is_public:
+        return True
+    return owner_id is not None and uid is not None and owner_id == uid
+
+
+def _report_owner(rpt):
+    """Zwraca (owner_id, is_public) dla raportu z cache (dict albo obiekt ArtworkReport)."""
+    if isinstance(rpt, dict):
+        return rpt.get("_owner_id"), rpt.get("_is_public")
+    return getattr(rpt, "_owner_id", None), getattr(rpt, "_is_public", None)
+
 def _cache_evict(cache_id: str) -> None:
     """Remove a specific entry (e.g. on corrupt build)."""
     with _cache_lock:
@@ -7423,8 +7445,7 @@ def api_artwork_page_images(cache_id, page_idx):
     result = _cache_get(cache_id)
     if not result:
         return jsonify({"error": "Sesja wygasła — wgraj pliki ponownie"}), 404
-    owner_id = _cache_get_owner(cache_id)
-    if owner_id is not None and owner_id != session["user_id"] and not can_see_all(session["role"]):
+    if not _artwork_access_allowed(_cache_get_owner(cache_id)):
         return jsonify({"error": "Brak dostępu"}), 403
     return jsonify(result.page_images(page_idx))
 
@@ -7580,21 +7601,15 @@ def _build_report_from_cache_or_db(cache_id, comp_id=None, user_id=None, role=No
             rpt = _rpt_cache[cache_id]
             # Enforce ownership on the pre-built report cache (mirrors artwork_report_page).
             if user_id is not None:
-                if isinstance(rpt, dict):
-                    _owner = rpt.get("_owner_id")
-                    _public = rpt.get("_is_public")
-                else:
-                    _owner = getattr(rpt, "_owner_id", None)
-                    _public = getattr(rpt, "_is_public", None)
-                if _owner is not None and _owner != user_id and not _public and not can_see_all(role):
+                _owner, _public = _report_owner(rpt)
+                if not _artwork_access_allowed(_owner, _public, uid=user_id, role=role):
                     return None
             return rpt
     _cached_result = _cache_get(cache_id) if cache_id else None
     if _cached_result:
         # Enforce ownership on the in-memory result cache (IDOR guard for exports).
         if cache_id and user_id is not None:
-            _owner = _cache_get_owner(cache_id)
-            if _owner is not None and _owner != user_id and not can_see_all(role):
+            if not _artwork_access_allowed(_cache_get_owner(cache_id), uid=user_id, role=role):
                 return None
         try:
             return build_report_from_comparison(_cached_result)
@@ -7662,13 +7677,8 @@ def artwork_report_page():
     # report may be a dict (built from DB JSON) or an ArtworkReport dataclass
     # (retrieved directly from _artwork_report_cache) — use getattr fallback.
     if report and cache_id:
-        if isinstance(report, dict):
-            owner_id = report.get("_owner_id")
-            is_public = report.get("_is_public")
-        else:
-            owner_id = getattr(report, "_owner_id", None)
-            is_public = getattr(report, "_is_public", None)
-        if owner_id is not None and owner_id != uid and not is_public and not can_see_all(role):
+        owner_id, is_public = _report_owner(report)
+        if not _artwork_access_allowed(owner_id, is_public, uid=uid, role=role):
             report = None
 
     # Fallback: load from DB by comparison id
@@ -8090,6 +8100,14 @@ def api_artwork_batch_run():
             report_obj = result.pop("report_obj", None)
             result.pop("docx_bytes", None)
             if report_obj:
+                # US-004: właściciel jak w drugim writerze — bez niego raport był widoczny dla każdego.
+                try:
+                    if isinstance(report_obj, dict):
+                        report_obj["_owner_id"] = uid
+                    else:
+                        setattr(report_obj, "_owner_id", uid)
+                except Exception:
+                    logger.warning("artwork batch: nie udało się oznaczyć właściciela raportu")
                 import uuid
                 cache_id = str(uuid.uuid4()).replace("-", "")[:16]
                 with _rpt_cache_lock:
@@ -8126,6 +8144,8 @@ def api_artwork_batch_zip():
     for meta in results_meta:
         cid = meta.get("cache_id")
         report = report_cache.get(cid) if cid else None
+        if report is not None and not _artwork_access_allowed(*_report_owner(report)):
+            report = None   # US-004: cudzy lub bez właściciela — nie trafia do ZIP-a
         results_full.append({**meta, "report_obj": report})
 
     from artwork_batch_processor import build_artwork_batch_zip
@@ -8157,6 +8177,8 @@ def artwork_zone_select():
     """Interaktywny selektor stref do manualnego porównania regionów artworku."""
     cache_id = request.args.get("cache_id", "")
     result   = _cache_get(cache_id)
+    if result and not _artwork_access_allowed(_cache_get_owner(cache_id)):
+        return "Brak dostępu do tego porównania.", 403
     if not result:
         flash("Brak danych porównania — najpierw wykonaj porównanie artworków.", "error")
         return redirect(url_for("artwork_compare_page"))
@@ -8193,6 +8215,8 @@ def api_artwork_zone_compare():
     result = _cache_get(cache_id)
     if not result:
         return jsonify({"error": "Brak danych porównania w cache"}), 404
+    if not _artwork_access_allowed(_cache_get_owner(cache_id)):
+        return jsonify({"error": "Brak dostępu"}), 403
     if not zones:
         return jsonify({"error": "Brak zdefiniowanych stref"}), 400
 
