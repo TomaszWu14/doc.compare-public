@@ -44,7 +44,8 @@ def spoken(text: str, wymowa: dict[str, str]) -> str:
 
 def clip_name(step_id: str, text: str, voice: dict) -> str:
     payload = json.dumps({"text": text, "voice": voice}, sort_keys=True, ensure_ascii=False)
-    return f"{step_id}-{hashlib.sha1(payload.encode('utf-8')).hexdigest()[:10]}.mp3"
+    # SHA1 tylko jako nazwa pliku cache (nie kryptografia) — stąd usedforsecurity=False (Bandit B324).
+    return f"{step_id}-{hashlib.sha1(payload.encode('utf-8'), usedforsecurity=False).hexdigest()[:10]}.mp3"
 
 
 def plan(script: dict, voice: dict, audio_dir: Path, only: str | None = None, force: bool = False):
@@ -80,7 +81,8 @@ def synthesize(text: str, prev_text: str, next_text: str, voice: dict, api_key: 
         method="POST",
     )
     try:
-        with urllib.request.urlopen(req, timeout=120) as resp:
+        # bandit B310: URL pochodzi ze stałej API_URL (https://api.elevenlabs.io), nie z wejścia użytkownika.
+        with urllib.request.urlopen(req, timeout=120) as resp:  # nosec B310
             return resp.read()
     except urllib.error.HTTPError as e:
         raise SystemExit(f"ElevenLabs {e.code}: {e.read().decode('utf-8', 'replace')[:300]}") from e
