@@ -42,7 +42,7 @@
 | V13.2 | REST: walidacja JSON, limity | L1 | ⚠️ | limit na 12 trasach | US-006 |
 | V14.1 | build odtwarzalny, bez zbędnych komponentów, nie-root | L2 | ❌ | root, brak pinów | US-022 (E-01) |
 | V14.2 | zależności aktualne, skanowane | L1 | ✅ | pip-audit, trivy, Dependabot (PR #11) | — |
-| V14.3 | brak debug/tracebacków w produkcji | L1 | ⚠️ | `app.py` debug tylko lokalnie; PalViz | US-027 |
+| V14.3 | brak debug/tracebacków w produkcji | L1 | ✅ | `app.py` debug tylko lokalnie; PalViz bez tracebacku od US-027 | — |
 | V14.4 | nagłówki HTTP bezpieczeństwa | L1 | ✅ | CSP, HSTS, nosniff, Referrer-Policy, Permissions-Policy, `X-Frame-Options` | — |
 | V14.5 | walidacja nagłówka Host / origin | L1 | ⚠️ | `ProxyFix(x_host)` bez listy dozwolonych hostów | US-003 |
 
