@@ -230,11 +230,9 @@ def templates_page():
 
 
 @bp.route("/api/artwork/templates/analyze", methods=["POST"])
-@login_required
+@require_role("manager")   # US-001: dekorator — wcześniej `if not require_role(...)` nigdy nie sprawdzał roli
 @csrf_protect
 def api_templates_analyze():
-    if not require_role("manager"):
-        return jsonify({"error": "Brak uprawnień"}), 403
     file = request.files.get("file")
     if not file or not file.filename.lower().endswith(".pdf"):
         return jsonify({"error": "Wymagany plik PDF"}), 400
@@ -281,11 +279,9 @@ def templates_preview(name):
 
 
 @bp.route("/api/artwork/templates/save", methods=["POST"])
-@login_required
+@require_role("manager")   # US-001: dekorator — wcześniej `if not require_role(...)` nigdy nie sprawdzał roli
 @csrf_protect
 def api_templates_save():
-    if not require_role("manager"):
-        return jsonify({"error": "Brak uprawnień"}), 403
     d = request.get_json(silent=True) or {}
     sig_key = (d.get("sig_key") or "").strip()
     regions = d.get("regions") or {}
