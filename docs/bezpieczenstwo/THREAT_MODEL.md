@@ -77,7 +77,7 @@ integralność statusów dostawy (bramki), sekrety integracji, dostępność apl
 | T: zmiana cudzego porównania | `user_id`/`is_public`/`can_see_all` po pobraniu; bramka działu `before_request` | — ✅ (12 tras sprawdzonych) | — |
 | I: eksfiltracja przez wynik | wyniki per autor/dział | KPI były globalne — naprawione ✅ | — |
 | D: wyczerpanie workerów (2×3) | limit 30/60 s na 12 trasach, `_HEAVY_SEM(3)`, timeout gunicorn 300 s | 22 ciężkie trasy bez limitu 🟡; semafor per proces ⚪ | US-006, US-020 |
-| T: path traversal przy pobieraniu | `send_from_directory` + prefiks `{uid}_`, `safe_join` | podgląd PalViz bez prefiksu uid ⚪ | US-027 |
+| T: path traversal przy pobieraniu | `send_from_directory` + prefiks `{uid}_`, `safe_join` | — ✅ po merge (podgląd PalViz przez `_serve` z prefiksem uid, PR #11) | US-027 |
 
 ### F-3 Wywołania AI i OCR (`ai_validator`, `ai_learning`, `table_extractor`, `artwork_comparator`)
 
@@ -87,7 +87,7 @@ integralność statusów dostawy (bramki), sekrety integracji, dostępność apl
 | I: wyciek danych poufnych do dostawcy modelu | tryb bez kluczy; brak PII w promptach (zamierzenie) | brak formalnej umowy/minimalizacji w docs 🟡 | RODO.md, Z-07 |
 | D/koszt: nieograniczone wywołania | budżet miesięczny, `record_usage` | bramka budżetu tylko w 2 modułach; `table_extractor`/`scan_extractor` nie rejestrują 🟡 | US-006 |
 | T: wynik modelu w SQL/ścieżkach | wynik parsowany jako JSON, brak użycia w SQL/FS | — ✅ | — |
-| I: prefiks klucza w `/api/ai/status` | `login_required` | 16 znaków klucza dla każdego zalogowanego ⚪ | US-027 |
+| I: prefiks klucza w `/api/ai/status` | odpowiedź tylko `api_key_set` + model (PR #11) | — ✅ po merge | US-027 |
 
 ### F-4 Portale zewnętrzne (`/spedycja`, `/agencja`)
 
@@ -138,8 +138,8 @@ integralność statusów dostawy (bramki), sekrety integracji, dostępność apl
 | Zagrożenie | Kontrola | Luka | Historyjka |
 |---|---|---|---|
 | E: dostęp do cudzego raportu artworku | `_artwork_access_allowed()` fail-closed we wszystkich odczytach po `cache_id` (PR #11) | — ✅ po merge | US-004 |
-| T: formula injection | XLSX: prefiks `'` dla `= + - @ \t \r` | CSV materiałów bez escape ⚪ | US-027 |
-| I: traceback w odpowiedzi | generyczny handler 500 | PalViz zwraca `traceback.format_exc()` ⚪ | US-027 |
+| T: formula injection | XLSX i CSV: wspólny `formula_safe` (prefiks `'` dla `= + - @ \t \r`) | — ✅ po merge | US-027 |
+| I: traceback w odpowiedzi | generyczny handler 500; PalViz zwraca identyfikator błędu, szczegóły w logu (PR #11) | — ✅ po merge | US-027 |
 | T: XSS w raporcie HTML | 0 `\|safe`, `escHtml` | CSP `unsafe-inline`/`unsafe-eval`, 244 `innerHTML`, `escHtml` bez cudzysłowów 🟡 | US-025 |
 
 ## 4. Podsumowanie luk

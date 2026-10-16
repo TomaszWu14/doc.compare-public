@@ -23,6 +23,9 @@ Wersja aplikacji: `constants.APP_VERSION`.
 - `security.yml` uruchamia się także na PR i pushu do `main` (dotąd tylko co miesiąc); Python 3.11 jak w produkcji.
 
 ### Security
+- **US-027 / R-10:** odpowiedzi 500 PalViz bez tracebacku i treści wyjątku (identyfikator błędu do logu);
+  `/api/ai/status` i `check_api_key()` bez fragmentu klucza API; eksport CSV materiałów neutralizuje formuły
+  (wspólny `export_engine.formula_safe`); podgląd szablonów PalViz tylko dla właściciela pliku lub superusera/admina.
 - **US-004 / R-04:** dostęp do raportów i wyników porównań artworków po `cache_id` jest fail-closed —
   jedna reguła `_artwork_access_allowed()` (właściciel, raport publiczny, superuser/admin) w sześciu miejscach.
   Domknięte też luki bez żadnej kontroli: eksport ZIP batcha, zone-select, zone-compare; writer batcha ustawia właściciela.

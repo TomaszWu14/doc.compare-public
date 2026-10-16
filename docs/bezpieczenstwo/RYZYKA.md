@@ -16,7 +16,7 @@
 | R-07 | Łańcuch dostaw: brak pinów/locka, kontener root, obraz bez digestu | 2 | 2 | 4 🟡 | `requirements*.txt`, `Dockerfile*` | US-022; Dependabot od PR #11; wyjątki E-01, E-04 | DEV/SEC | 2026-11-30 |
 | R-08 | Prompt injection przez treść PDF w uczeniu profili | 2 | 2 | 4 🟡 | `ai_learning.py:205-211` | US-026; mitygacja: akceptacja managera | DEV | 2026-12-31 |
 | R-09 | RODO: brak retencji, anonimizacji, eksportu; PII w `audit_log` po usunięciu konta; brak umów powierzenia w docs | 2 | 2 | 4 🟡 | `app.py:3885`, brak `DELETE` dla `audit_log` | US-007; decyzje Z-06, Z-07 | PO/SEC | 2026-11-30 |
-| R-10 | Drobne wycieki: traceback PalViz, prefiks klucza, CSV bez escape, logout GET | 1 | 2 | 2 ⚪ | `palviz.py:126, 270`; `ai_validator.py:141`; `app.py:13489` | US-027 | DEV | 2026-12-31 |
+| R-10 | Drobne wycieki: traceback PalViz, prefiks klucza, CSV bez escape, logout GET | 1 | 2 | 2 ⚪ | `palviz.py:126, 270`; `ai_validator.py:141`; `app.py:13489` | **w większości naprawione w PR #11** (US-027); pozostaje wylogowanie przez GET → US-028 | DEV | 2026-12-31 |
 | R-11 | Obejścia bramek procesu (advance bez porównania, confirm-departure z `artwork_bledne`, set-status bez checklisty) — ryzyko biznesowe: dostawa z błędem przechodzi | 3 | 2 | **6 🟡** | `docs/07-ograniczenia.md` §3 | US-008/US-009; wymaga decyzji PO (Z-03) | PO/BA | po odpowiedzi PO |
 | R-12 | Stan per proces przy 2 workerach (cache, limity, semafor, wątki przy imporcie) → niespójne limity, zdublowane pętle | 2 | 3 | 6 🟡 | `app.py:339, 443, 535, 585, 6282` | US-020 | DEV | 2026-12-31 |
 | R-13 | Schemat w 3 źródłach → dryf SQLite/PG, ciche braki kolumn/CHECK | 2 | 2 | 4 🟡 | `docs/AUDYT.md` §3.6 | US-018 | DEV | 2026-12-31 |

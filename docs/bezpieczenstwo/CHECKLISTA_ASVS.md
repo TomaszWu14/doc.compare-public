@@ -14,7 +14,7 @@
 | V2.5.x | link resetu z zaufanej domeny | L1 | ❌ | `request.host_url` fallback | US-003 |
 | V2.8 | 2FA | L2 | ❌ | brak | decyzja PO (SEC-004) |
 | V3.2 | nowa sesja po logowaniu, losowy identyfikator | L1 | ✅ | `session.clear()`, podpis Flask | — |
-| V3.3 | wylogowanie unieważnia sesję; bezczynność/limit absolutny | L1 | ⚠️ | 8 h absolutne; logout przez GET | US-027 |
+| V3.3 | wylogowanie unieważnia sesję; bezczynność/limit absolutny | L1 | ⚠️ | 8 h absolutne; logout przez GET | US-028 |
 | V3.4 | atrybuty ciasteczek Secure, HttpOnly, SameSite | L1 | ✅ | `app.py:197-199` | — |
 | V3.5 | tokeny API: losowe, porównanie stałoczasowe | L2 | ✅ | `require_api_key`, intake, biblioteka | — |
 | V4.1 | kontrola dostępu po stronie serwera, deny by default | L1 | ⚠️ | opt-in per trasa (brak deny by default); błąd PalViz naprawiony w US-001, strażnik statyczny w testach | checklista PR |
@@ -29,7 +29,7 @@
 | V6 Kryptografia | sekrety w env, losowość CSPRNG | L1 | ⚠️ | `secrets.*` tak; klucze w `settings` jawnym tekstem | US-002 |
 | V7.1 | logi bez sekretów i PII poza potrzebą | L1 | ⚠️ | brak sekretów; IP + nazwa w każdym wpisie | US-007 |
 | V7.2 | zdarzenia bezpieczeństwa logowane (login, dostęp odrzucony) | L1 | ✅ | `audit_log`, logger dla CSRF/401 | — |
-| V7.4 | obsługa błędów bez wycieku szczegółów | L1 | ⚠️ | generyczny 500; PalViz traceback, 3× `str(e)` | US-027 |
+| V7.4 | obsługa błędów bez wycieku szczegółów | L1 | ✅ | generyczny 500; PalViz z identyfikatorem błędu (US-027); 3× `str(ValueError)` to komunikaty walidacji dla użytkownika — przejrzane, bez zmian | — |
 | V8.1 | ochrona danych wrażliwych w cache i backupach | L1 | ⚠️ | `no-store` dla HTML; backup bez szyfrowania (do potwierdzenia) | RUNBOOK |
 | V8.3 | retencja i usuwanie danych osobowych | L1 | ❌ | brak retencji | US-007 |
 | V9 Komunikacja | TLS, HSTS | L1 | ✅ | HSTS przy HTTPS; TLS terminuje Coolify/Traefik | — |
