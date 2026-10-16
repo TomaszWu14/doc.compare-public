@@ -13515,6 +13515,7 @@ def api_artwork_materials_import_csv():
 def api_artwork_materials_export_csv():
     """Export material master as CSV."""
     import csv, io
+    from export_engine import formula_safe
     db = get_db()
     try:
         _ensure_artwork_profile_tables(db)
@@ -13539,7 +13540,8 @@ def api_artwork_materials_export_csv():
                      "ean": m["ean"] or "", "notes": m["notes"] or ""}
             for lt in level_types:
                 row_d[f"{lt['code']}_profile"] = _profile_map.get((m["id"], lt["id"]), "")
-            writer.writerow(row_d)
+            # US-027: neutralizacja formuł (CSV otwierany w arkuszu wykonuje =, +, -, @)
+            writer.writerow({k: formula_safe(v) for k, v in row_d.items()})
         csv_bytes = buf.getvalue().encode("utf-8-sig")
         return csv_bytes, 200, {
             "Content-Type": "text/csv; charset=utf-8",

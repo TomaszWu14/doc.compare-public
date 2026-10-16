@@ -138,7 +138,7 @@ def is_api_key_set() -> dict:
     key = _get_api_key()
     if not key:
         return {"ok": False, "api_key_set": False}
-    return {"ok": True, "api_key_set": True, "model": CLAUDE_MODEL, "key_prefix": key[:16] + "..."}
+    return {"ok": True, "api_key_set": True, "model": CLAUDE_MODEL}  # US-027: bez fragmentu klucza
 
 
 def check_api_key() -> dict:
@@ -153,7 +153,7 @@ def check_api_key() -> dict:
         return {"ok": False, "error": "Nieprawidłowy format klucza (powinien zaczynać się od sk-ant-)"}
     result = _call_claude('test', system='Odpowiedz: {"ok":true}', max_tokens=20)
     if isinstance(result, dict) and "error" not in result:
-        return {"ok": True, "model": CLAUDE_MODEL, "key_prefix": key[:16] + "..."}
+        return {"ok": True, "model": CLAUDE_MODEL}  # US-027: bez fragmentu klucza
     return {"ok": False, "error": result.get("error", "Błąd API")}
 
 
