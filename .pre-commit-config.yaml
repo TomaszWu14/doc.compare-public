@@ -1,11 +1,28 @@
-# Hooki pre-commit (opcjonalne, dla deweloperów). Instalacja:
+# Hooki pre-commit (dla deweloperów). Instalacja:
 #   pip install pre-commit && pre-commit install
-# Uruchamiają ruff (lint + format) na zmienianych plikach przed commitem.
-# Świadomie NIE uruchamiamy tu pytest (wolne) — testy pilnuje bramka CI.
+# Uruchamiają się na zmienianych plikach przed commitem. Świadomie NIE uruchamiamy
+# tu pytest (wolne) — testy pilnuje bramka CI. Skan sekretów (gitleaks) działa tu
+# i w CI (security.yml), żeby sekret nie trafił nawet do lokalnego commita.
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9
+    rev: v0.16.8
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=2048"]
+      - id: end-of-file-fixer
+        exclude: ^static/design/
+      - id: trailing-whitespace
+        exclude: ^static/design/
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: detect-private-key
