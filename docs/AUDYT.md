@@ -272,7 +272,7 @@ Szablony nigdy nie renderowane ani nie dołączane: **`agent_proforma.html` (359
 | SQL: 27 f-stringów w `execute(` składają stałe fragmenty, wartości przez parametry; brak `shell=True`, `eval`, `pickle`, `yaml.load` | przegląd `app.py:3975, 9483, 12455-12507` |
 | Integracje maszynowe: `X-Api-Key` / `Bearer` przez `hmac.compare_digest` | `core/security.py:113-130`, `app.py:9917-9923, 13758-13766` |
 | Webhooki wychodzące: tylko admin, blokada adresów prywatnych/loopback | `app.py:13819-13836` |
-| Szablony: 0 `|safe`, 0 `Markup(`, 0 `render_template_string`; Excel: prefiks apostrofu dla `= + - @ \t \r` | `templates/`, `export_engine.py:123-128` |
+| Szablony: 0 `\|safe`, 0 `Markup(`, 0 `render_template_string`; Excel: prefiks apostrofu dla `= + - @ \t \r` | `templates/`, `export_engine.py:123-128` |
 | Ostatni admin nie może być usunięty; `delete_user` chroniony | `app.py:3880-3884` |
 
 ### 4.2 Wyniki narzędzi
