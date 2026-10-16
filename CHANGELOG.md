@@ -23,6 +23,9 @@ Wersja aplikacji: `constants.APP_VERSION`.
 - `security.yml` uruchamia się także na PR i pushu do `main` (dotąd tylko co miesiąc); Python 3.11 jak w produkcji.
 
 ### Security
+- **US-004 / R-04:** dostęp do raportów i wyników porównań artworków po `cache_id` jest fail-closed —
+  jedna reguła `_artwork_access_allowed()` (właściciel, raport publiczny, superuser/admin) w sześciu miejscach.
+  Domknięte też luki bez żadnej kontroli: eksport ZIP batcha, zone-select, zone-compare; writer batcha ustawia właściciela.
 - **US-001 / R-01:** endpointy kreatora szablonów wykrojników PalViz (`/api/artwork/templates/analyze`, `/save`)
   wymagają roli `manager`. Wcześniej `if not require_role(...)` nigdy nie sprawdzał roli, więc każdy zalogowany
   użytkownik mógł analizować i zapisywać szablony. Dodany strażnik w testach: `require_role()` tylko jako dekorator.

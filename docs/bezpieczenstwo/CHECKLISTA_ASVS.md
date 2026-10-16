@@ -19,7 +19,7 @@
 | V3.5 | tokeny API: losowe, porównanie stałoczasowe | L2 | ✅ | `require_api_key`, intake, biblioteka | — |
 | V4.1 | kontrola dostępu po stronie serwera, deny by default | L1 | ⚠️ | opt-in per trasa (brak deny by default); błąd PalViz naprawiony w US-001, strażnik statyczny w testach | checklista PR |
 | V4.1.3 | zasada najmniejszych uprawnień | L1 | ⚠️ | manager zapisuje klucze API | US-002 |
-| V4.2 | kontrola na poziomie obiektu (IDOR) | L1 | ⚠️ | 12 tras OK; raport artworku fail-open | US-004 |
+| V4.2 | kontrola na poziomie obiektu (IDOR) | L1 | ⚠️ | 12 tras OK; cache artworków fail-closed od US-004; joby faktur bez właściciela (z założenia) | — |
 | V4.2.2 | CSRF | L1 | ✅ | token per sesja, wszystkie sesyjne zapisy | — |
 | V4.3 | ochrona panelu admina | L1 | ✅ | `require_role("admin")`, brak 2FA (L2) | — |
 | V5.1 | walidacja wejścia (allow-list, długości) | L1 | ⚠️ | Pydantic w auth/suppliers/warehouse; reszta ręcznie | stopniowo |

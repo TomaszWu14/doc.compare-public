@@ -67,6 +67,7 @@ Then  link zaczyna się od APP_BASE_URL, a nie od wartości z nagłówka
 ### US-004 · Raport artworku bez właściciela jest niedostępny
 **Jako** właściciel raportu artworku **chcę**, aby raport bez przypisanego właściciela nie był widoczny dla innych, **aby** kontrola dostępu była fail-closed.
 Wymaganie: SEC-016. Ryzyko: R-04. Typ: security. Dowód: `app.py:7584-7598, 7666-7671, 8090-8097`.
+**Status: zrealizowane w PR #11.** Zakres rozszerzony w kroku SEC o ścieżki bez żadnej kontroli: eksport ZIP batcha (`/api/artwork/batch/zip`), `/artwork/zone-select`, `/api/artwork/zone-compare` oraz podgląd stron (`/api/artwork/page/...`).
 
 ```gherkin
 Given raport w cache bez pola _owner_id

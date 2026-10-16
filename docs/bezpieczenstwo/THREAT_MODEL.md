@@ -137,7 +137,7 @@ integralność statusów dostawy (bramki), sekrety integracji, dostępność apl
 
 | Zagrożenie | Kontrola | Luka | Historyjka |
 |---|---|---|---|
-| E: dostęp do cudzego raportu artworku | sprawdzenie `_owner_id` | fail-open gdy brak właściciela; writer async nie ustawia 🟡 | US-004 |
+| E: dostęp do cudzego raportu artworku | `_artwork_access_allowed()` fail-closed we wszystkich odczytach po `cache_id` (PR #11) | — ✅ po merge | US-004 |
 | T: formula injection | XLSX: prefiks `'` dla `= + - @ \t \r` | CSV materiałów bez escape ⚪ | US-027 |
 | I: traceback w odpowiedzi | generyczny handler 500 | PalViz zwraca `traceback.format_exc()` ⚪ | US-027 |
 | T: XSS w raporcie HTML | 0 `\|safe`, `escHtml` | CSP `unsafe-inline`/`unsafe-eval`, 244 `innerHTML`, `escHtml` bez cudzysłowów 🟡 | US-025 |

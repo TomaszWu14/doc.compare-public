@@ -10,7 +10,7 @@
 | R-01 | Endpointy szablonów PalViz dostępne dla każdego zalogowanego (`require_role` jako bool) | 2 | 3 | **6 🟠** | `blueprints/palviz.py:236, 287` | **naprawione w PR #11** (dekorator + 8 testów + strażnik statyczny); zamknięcie po merge | DEV | po merge |
 | R-02 | Klucze API/SMS/Anthropic jawnym tekstem w `settings`, zapis przez managera, token SMSAPI w URL | 3 | 2 | **6 🟡** | `app.py:16005, 17167, 8526, 17234` | naprawa US-002 | DEV/SEC | 2026-11-30 |
 | R-03 | Link resetu hasła z nagłówka Host przy braku `APP_BASE_URL` | 3 | 1 | 3 🟡 | `blueprints/auth.py:303`, `app.py:110` | naprawa US-003; do tego czasu `APP_BASE_URL` ustawione na demo (do sprawdzenia) | DEV | 2026-11-30 |
-| R-04 | Raport artworku bez właściciela dostępny po identyfikatorze (fail-open) | 2 | 1 | 2 🟡 | `app.py:7590, 7671, 8097` | naprawa US-004 | DEV | 2026-11-30 |
+| R-04 | Raport artworku bez właściciela dostępny po identyfikatorze (fail-open) | 2 | 1 | 2 🟡 | `app.py:7590, 7671, 8097` | **naprawione w PR #11** (reguła fail-closed w 6 miejscach + 19 testów); zamknięcie po merge | DEV | po merge |
 | R-05 | CSP nie chroni przed XSS (`unsafe-inline`/`unsafe-eval`, 244 `innerHTML`, brak SRI) | 2 | 2 | 4 🟡 | `app.py:242-249`, `base.html` | US-025; wyjątek E-05 do tego czasu | DEV | 2026-12-31 |
 | R-06 | 22 ciężkie endpointy bez limitu; budżet AI omijany przez część wywołań | 2 | 2 | 4 🟡 | `app.py:476-510`, `api_usage_tracker.py:111` | US-006 | DEV | 2026-12-31 |
 | R-07 | Łańcuch dostaw: brak pinów/locka, kontener root, obraz bez digestu | 2 | 2 | 4 🟡 | `requirements*.txt`, `Dockerfile*` | US-022; Dependabot od PR #11; wyjątki E-01, E-04 | DEV/SEC | 2026-11-30 |

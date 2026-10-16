@@ -106,4 +106,5 @@ pre-commit install            # ruff, gitleaks, końce linii, duże pliki
 
 | Wzorzec | Dlaczego | Strażnik |
 |---|---|---|
+| `owner is not None and owner != uid` (kontrola właściciela fail-open) | wpis bez właściciela byłby widoczny dla każdego (R-04) | `tests/test_artwork_report_access.py::test_SEC016_no_fail_open_owner_checks` |
 | `if not require_role("…")` / dowolne użycie `require_role(...)` poza dekoratorem | `require_role` to fabryka dekoratorów; jako wartość logiczna jest zawsze prawdziwa i nie sprawdza roli (R-01) | `tests/test_palviz_roles.py::test_SEC005_require_role_only_used_as_decorator` |

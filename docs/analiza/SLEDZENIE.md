@@ -11,7 +11,7 @@
 | SEC-005 | US-001 | `tests/test_palviz_roles.py` — 8 testów: user/forwarder → 403 bez zapisu, anonim → login, manager → 200/400, brak CSRF → 403, strażnik `test_SEC005_require_role_only_used_as_decorator` | #11 | w przeglądzie (odbiór BA ✅, SEC ✅) |
 | SEC-009 | US-002 | planowany `tests/test_settings_encryption.py` | — | do realizacji |
 | SEC-015 | US-003 | planowany `tests/test_auth_blueprint.py::test_SEC015_reset_link_uses_app_base_url` | — | do realizacji |
-| SEC-016 | US-004 | planowany `tests/test_artwork_report_access.py` | — | do realizacji |
+| SEC-016 | US-004 | `tests/test_artwork_report_access.py` — 19 testów: reguła (8 przypadków), builder, strona raportu, ZIP batcha, podgląd stron, zone-select, zone-compare, writer batcha, strażnik wzorca fail-open | #11 | w przeglądzie (odbiór BA ✅, SEC ✅) |
 | SEC-017, NFR-009 | US-006 | planowany `tests/test_rate_limit_heavy.py` | — | do realizacji |
 | SEC-011, NFR-018 | US-007 | planowany `tests/test_retention.py` | — | decyzja PO (Z-06) |
 | FR-041 | US-008 | istniejący `tests/test_delivery_workflow.py` + nowy test hooków | — | decyzja PO |
