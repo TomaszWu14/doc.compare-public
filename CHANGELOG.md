@@ -23,6 +23,9 @@ Wersja aplikacji: `constants.APP_VERSION`.
 - `security.yml` uruchamia się także na PR i pushu do `main` (dotąd tylko co miesiąc); Python 3.11 jak w produkcji.
 
 ### Security
+- **US-026 / R-08:** treść dokumentów w promptach AI jest danymi — nowy `core/prompt_safety.py`
+  (`sanitize`, `wrap_untrusted`, reguła w prompcie systemowym); `ai_learning` sanityzuje i opakowuje nagłówek PDF,
+  komórki tabel, znaleziska i ocenę AI; `ai_validator` używa tej samej funkcji sanityzującej.
 - **US-027 / R-10:** odpowiedzi 500 PalViz bez tracebacku i treści wyjątku (identyfikator błędu do logu);
   `/api/ai/status` i `check_api_key()` bez fragmentu klucza API; eksport CSV materiałów neutralizuje formuły
   (wspólny `export_engine.formula_safe`); podgląd szablonów PalViz tylko dla właściciela pliku lub superusera/admina.

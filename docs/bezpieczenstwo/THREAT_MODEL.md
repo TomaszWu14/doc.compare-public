@@ -83,7 +83,7 @@ integralność statusów dostawy (bramki), sekrety integracji, dostępność apl
 
 | Zagrożenie | Kontrola | Luka | Historyjka |
 |---|---|---|---|
-| T: prompt injection z treści PDF | `ai_validator._fmt_findings` sanityzuje; AI może tylko podnieść ryzyko; sugestie czekają na managera | `ai_learning.py:205-211` wstawia surowy nagłówek i wiersze 🟡 | US-026 |
+| T: prompt injection z treści PDF | `core.prompt_safety` w obu modułach: sanityzacja, blok `<dane_niezaufane>`, reguła systemowa; AI może tylko podnieść ryzyko; sugestie czekają na managera (PR #11) | szczątkowe: model może zignorować regułę ⚪ | US-026 |
 | I: wyciek danych poufnych do dostawcy modelu | tryb bez kluczy; brak PII w promptach (zamierzenie) | brak formalnej umowy/minimalizacji w docs 🟡 | RODO.md, Z-07 |
 | D/koszt: nieograniczone wywołania | budżet miesięczny, `record_usage` | bramka budżetu tylko w 2 modułach; `table_extractor`/`scan_extractor` nie rejestrują 🟡 | US-006 |
 | T: wynik modelu w SQL/ścieżkach | wynik parsowany jako JSON, brak użycia w SQL/FS | — ✅ | — |

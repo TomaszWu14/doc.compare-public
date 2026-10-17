@@ -23,7 +23,7 @@
 | V4.2.2 | CSRF | L1 | ✅ | token per sesja, wszystkie sesyjne zapisy | — |
 | V4.3 | ochrona panelu admina | L1 | ✅ | `require_role("admin")`, brak 2FA (L2) | — |
 | V5.1 | walidacja wejścia (allow-list, długości) | L1 | ⚠️ | Pydantic w auth/suppliers/warehouse; reszta ręcznie | stopniowo |
-| V5.2 | sanityzacja (HTML, SQL, LDAP, OS) | L1 | ✅ | brak `\|safe`, parametryzowane SQL, brak `shell=True` | — |
+| V5.2 | sanityzacja (HTML, SQL, LDAP, OS, prompty LLM) | L1 | ✅ | brak `\|safe`, parametryzowane SQL, brak `shell=True`; treść dokumentów w promptach przez `core.prompt_safety` (US-026) | — |
 | V5.3 | kodowanie wyjścia, CSP | L1 | ⚠️ | Jinja autoescape; CSP `unsafe-inline` | US-025 |
 | V5.5 | bezpieczne deserializowanie | L1 | ✅ | brak pickle/yaml.load | — |
 | V6 Kryptografia | sekrety w env, losowość CSPRNG | L1 | ⚠️ | `secrets.*` tak; klucze w `settings` jawnym tekstem | US-002 |

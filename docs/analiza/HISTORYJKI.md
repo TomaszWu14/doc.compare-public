@@ -104,7 +104,7 @@ Then  commit/PR jest odrzucony
 | US-006 | Jako operator chcę limitu wywołań na ciężkich endpointach AI/upload (22 trasy) i jednego klienta Claude, który bramkuje budżetem i rejestruje koszt każdego wywołania (także `table_extractor`, `scan_extractor`). | SEC-017, NFR-009, NFR-010 | R-06 | nie |
 | US-007 | Jako administrator danych chcę inwentarza danych osobowych, zadania retencji dla `audit_log` i powiadomień oraz pseudonimizacji po usunięciu konta, aby spełnić RODO. | SEC-011, NFR-018 | R-09 | tak (okresy — Z-06) |
 | US-025 | Jako [SEC] chcę CSP z nonce (bez `unsafe-inline`/`unsafe-eval`), zasobów CDN z przypiętą wersją i SRI oraz jednego `escHtml`, aby CSP realnie chroniło przed XSS. | SEC-008 | R-05 | nie |
-| US-026 | Jako [SEC] chcę, aby `ai_learning.py` delimitował i sanityzował treść PDF tak samo jak `ai_validator`, aby spreparowany dokument nie sterował sugestiami profilu. | SEC-012 | R-08 | nie |
+| US-026 | Jako [SEC] chcę, aby `ai_learning.py` delimitował i sanityzował treść PDF tak samo jak `ai_validator`, aby spreparowany dokument nie sterował sugestiami profilu. **Zrealizowane w PR #11.** | SEC-012 | R-08 | nie |
 | US-027 | Jako użytkownik chcę generycznych komunikatów 500 w PalViz, odpowiedzi `/api/ai/status` bez prefiksu klucza, escape formuł w eksporcie CSV materiałów i podglądu szablonów tylko dla właściciela. **Zrealizowane w PR #11.** | SEC-010 | R-10 | nie |
 | US-028 | Jako użytkownik chcę wylogowania przez POST z tokenem CSRF (formularz zamiast linku w 4 szablonach), aby obca strona nie mogła mnie wylogować. Wydzielone z US-027: zmiana UI, ryzyko niskie dzięki `SameSite=Strict`. | SEC-010 | R-10 | nie |
 
