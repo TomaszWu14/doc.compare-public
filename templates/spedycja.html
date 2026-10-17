@@ -54,7 +54,7 @@
     <div class="brand"><span class="ic" aria-hidden="true">🚛</span> Portal Spedycji</div>
     <nav style="display:flex;align-items:center;gap:14px" aria-label="Konto użytkownika">
       <span class="who">{{ forwarder_name or '—' }} · <b>{{ username }}</b></span>
-      <a href="/logout" class="btn">Wyloguj</a>
+      <form method="post" action="/logout" style="display:inline;margin:0"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn" style="font:inherit">Wyloguj</button></form>
     </nav>
   </header>
 
