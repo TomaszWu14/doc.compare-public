@@ -56,6 +56,10 @@ jobs:
         run: pip install pip-audit
       - name: Zestaw produkcyjny (blokuje)
         run: pip-audit -r requirements-prod.txt --progress-spinner off
+      # Dockerfile instaluje requirements.txt — jeśli zestaw się nie rozwiązuje,
+      # build obrazu w Coolify pada. Ten krok blokuje (sama rozdzielczość, bez instalacji).
+      - name: requirements.txt da się zainstalować (blokuje)
+        run: pip install --dry-run --ignore-installed --quiet -r requirements.txt
       - name: Pełny zestaw ML (doradczo — ciężkie pakiety, część bez kół dla runnera)
         continue-on-error: true
         run: pip-audit -r requirements.txt --progress-spinner off

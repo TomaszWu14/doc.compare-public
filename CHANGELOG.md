@@ -24,12 +24,17 @@ Wersja aplikacji: `constants.APP_VERSION`.
 
 ### Fixed
 
+- **Build obrazu (R-15):** `requirements.txt` po PR #23 nie dawał się zainstalować — `surya-ocr` wymaga
+  `pillow<11`, a podniesiono `pillow>=12.3` (pip: ResolutionImpossible; Dockerfile instaluje ten plik).
+  `pillow` wraca do `>=10.2,<11`, `pypdf>=6.20.1` zostaje. Nowy blokujący krok w `security.yml` sprawdza,
+  czy `requirements.txt` się rozwiązuje, więc taka zmiana nie przejdzie już przez CI.
+
 - CI: deploy demo do Coolify — przy odpowiedzi 405 na GET ponawia wywołanie metodą POST i loguje kod HTTP (deploy po merge #11 nie ruszył).
 
 ### Security
 - **R-15:** obraz produkcyjny (Dockerfile → `requirements.txt`) miał pypdf 4.3.1 z 85 znanymi podatnościami
-  i pillow 10.4.0; podniesione do pypdf ≥6.20.1 i pillow ≥12.3 (wersje, na których CI już testował).
-  Pozostaje transformers 4.57.6 → US-029.
+  i pillow 10.4.0; pypdf podniesione do ≥6.20.1. Pillow (≥12.3) musiało wrócić do <11 — blokuje je
+  `surya-ocr` (zob. „Fixed”); pillow i transformers 4.57.6 → US-029.
 - **US-006 / R-06:** limit 30 wywołań / 60 s na użytkownika dla 19 kosztownych tras (Claude Vision, OCR skanów,
   render PDF i 3D, batch i porównania artworków, PalViz, podgląd tabeli dostawcy); odpowiedź 429 z `Retry-After`.
   Limiter przeniesiony do `core/rate_limit.py` (dekorator `heavy_rate_limit`, dostępny też dla blueprintów).

@@ -24,7 +24,7 @@ paddleocr>=2.7                 # PaddleOCR: najwyższa dokładność na drukowan
 easyocr>=1.7                   # Neural OCR: 80+ języków — fallback dla cyrylicy i trudnych cropów
 python-doctr[torch]>=0.9       # DocTR: głęboki OCR — tertiary fallback (wysokie recall na etykietach)
 pdf2image>=1.16                # PDF → obrazy dla OCR
-pillow>=12.3,<13.0             # Przetwarzanie obrazów; <12.3 has known CVEs
+pillow>=10.2,<11.0             # Przetwarzanie obrazów; capped <11 by surya-ocr (known CVEs until 12.3 — US-029)
 opencv-python-headless>=4.8
 
 # ── Analiza wizualna (artwork diff) ──────────────────────
