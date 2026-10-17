@@ -430,13 +430,16 @@ def _trunc(v, n=400) -> str:
     return s[:n] + ("…" if len(s) > n else "")
 
 
+from core.prompt_safety import sanitize  # noqa: E402
+
+
 # FIX 13: Increased max_items from 50 to 100 for more findings in AI prompt
 def _fmt_findings(findings: list, max_items: int = 100) -> str:
     # Sanitise document-derived text before embedding it in the prompt: strip
     # control chars and collapse whitespace so malicious cell content can't break
     # out of the line structure or inject instructions (prompt injection).
     def _san(v):
-        return re.sub(r"\s+", " ", re.sub(r"[\x00-\x1f]", " ", str(v or ""))).strip()
+        return sanitize(v or "")   # US-026: wspólna funkcja z core.prompt_safety
     lines = []
     for i, f in enumerate(findings[:max_items]):
         if not isinstance(f, dict):
