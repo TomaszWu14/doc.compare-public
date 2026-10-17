@@ -1,0 +1,9 @@
+# Fałszywe alarmy gitleaks — każdy z uzasadnieniem (polityka: docs/bezpieczenstwo/RYZYKA.md, sekcja „Wyjątki”).
+# Format: <commit>:<plik>:<reguła>:<linia> (fingerprint z raportu gitleaks).
+# Nie cytuj tu wartości z alarmu — komentarz sam zostanie zeskanowany.
+#
+# E-08 (2026-10-16): pole API sig_key z syntetyczną sygnaturą szablonu wykrojnika w teście US-001,
+# nie sekret; reguła generic-api-key reaguje na słowo „key”. Drugi wpis to poprzednia wersja
+# tego komentarza, która cytowała wartość.
+a96ec3570bfb70a757cf20aa79897b3b92f5bbef:tests/test_palviz_roles.py:generic-api-key:28
+c4f8c1659dd6c68ba3b25316fd91eb65521f111c:.gitleaksignore:generic-api-key:4

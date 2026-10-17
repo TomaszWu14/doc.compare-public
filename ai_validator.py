@@ -138,7 +138,7 @@ def is_api_key_set() -> dict:
     key = _get_api_key()
     if not key:
         return {"ok": False, "api_key_set": False}
-    return {"ok": True, "api_key_set": True, "model": CLAUDE_MODEL, "key_prefix": key[:16] + "..."}
+    return {"ok": True, "api_key_set": True, "model": CLAUDE_MODEL}  # US-027: bez fragmentu klucza
 
 
 def check_api_key() -> dict:
@@ -153,7 +153,7 @@ def check_api_key() -> dict:
         return {"ok": False, "error": "Nieprawidłowy format klucza (powinien zaczynać się od sk-ant-)"}
     result = _call_claude('test', system='Odpowiedz: {"ok":true}', max_tokens=20)
     if isinstance(result, dict) and "error" not in result:
-        return {"ok": True, "model": CLAUDE_MODEL, "key_prefix": key[:16] + "..."}
+        return {"ok": True, "model": CLAUDE_MODEL}  # US-027: bez fragmentu klucza
     return {"ok": False, "error": result.get("error", "Błąd API")}
 
 
@@ -430,13 +430,16 @@ def _trunc(v, n=400) -> str:
     return s[:n] + ("…" if len(s) > n else "")
 
 
+from core.prompt_safety import sanitize  # noqa: E402
+
+
 # FIX 13: Increased max_items from 50 to 100 for more findings in AI prompt
 def _fmt_findings(findings: list, max_items: int = 100) -> str:
     # Sanitise document-derived text before embedding it in the prompt: strip
     # control chars and collapse whitespace so malicious cell content can't break
     # out of the line structure or inject instructions (prompt injection).
     def _san(v):
-        return re.sub(r"\s+", " ", re.sub(r"[\x00-\x1f]", " ", str(v or ""))).strip()
+        return sanitize(v or "")   # US-026: wspólna funkcja z core.prompt_safety
     lines = []
     for i, f in enumerate(findings[:max_items]):
         if not isinstance(f, dict):

@@ -54,3 +54,9 @@ node_modules/
 *.dump
 *.bak
 .DS_Store
+
+# Coverage (pytest-cov)
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/

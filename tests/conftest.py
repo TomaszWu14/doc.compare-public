@@ -34,6 +34,7 @@ import blueprints.auth as _auth_mod  # noqa: E402
 TEST_USERS = {
     "it_admin":     ("itpass-admin-123",     "admin"),
     "it_manager":   ("itpass-manager-123",   "manager"),
+    "it_user":      ("itpass-user-123",      "user"),       # najniższa rola wewnętrzna
     "it_forwarder": ("itpass-forwarder-123", "forwarder"),  # rola zewnętrzna (portal spedycji)
 }
 CSRF_TOKEN = "test-csrf-token-deadbeef"
@@ -95,6 +96,13 @@ def admin_client(client):
 def manager_client(client):
     resp = login(client, "it_manager")
     assert resp.status_code in (302, 303), f"login managera nie przekierował: {resp.status_code}"
+    return client
+
+
+@pytest.fixture
+def user_client(client):
+    resp = login(client, "it_user")
+    assert resp.status_code in (302, 303), f"login usera nie przekierował: {resp.status_code}"
     return client
 
 

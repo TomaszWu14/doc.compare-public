@@ -1,0 +1,7 @@
+# Wyjątki Trivy — każdy z uzasadnieniem i datą przeglądu (rejestr: docs/bezpieczenstwo/RYZYKA.md).
+#
+# E-01 / R-07: kontener działa jako root (brak USER w Dockerfile, Dockerfile.slim, Dockerfile.base).
+# Dodanie użytkownika nie-root wymaga sprawdzenia uprawnień do wolumenu /data (uploads, instance/.secret_key,
+# migracje przy starcie) — historyjka US-022. Przegląd wyjątku: 2026-11-30.
+DS002
+AVD-DS-0002

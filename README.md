@@ -37,6 +37,26 @@ niezgodność blokuje kolejny krok, a przed odprawą aplikacja wymaga zatwierdzo
 Starsze dokumenty w `docs/` (runbook IT, backup, kolejkowanie, plan refaktoru) opisują stronę techniczną.
 `PROCES_ZAKUPY_FLOW.md` i `PROCES_POTWIERDZENIE_ETD.md` to proces docelowy — stan obecny opisują 02 i 07.
 
+## Jak prowadzony jest projekt (proces zespołowy)
+
+Od 2026-10 repozytorium jest prowadzone jak przez trzyosobowy zespół: **[BA]** analityk biznesowy, **[DEV]** developer,
+**[SEC]** bezpieczeństwo, z Product Ownerem decydującym o zakresie i ryzykach. Każda zmiana zostawia ślad:
+historyjka → threat model → ADR → PR z przeglądem SEC i odbiorem BA → CHANGELOG. Proces, Definition of Ready/Done
+i bramki CI: [`CONTRIBUTING.md`](CONTRIBUTING.md). Zgłaszanie podatności: [`SECURITY.md`](SECURITY.md).
+
+| Obszar | Dokumenty |
+|---|---|
+| Audyt otwierający (BA/DEV/SEC) | [`docs/AUDYT.md`](docs/AUDYT.md) |
+| Analiza [BA] | [`docs/analiza/`](docs/analiza/) — wizja, interesariusze, procesy, wymagania, historyjki (backlog), słownik, założenia, śledzenie |
+| Architektura [DEV] | [`docs/architektura/`](docs/architektura/) — C4, model danych, API, ADR |
+| Bezpieczeństwo [SEC] | [`docs/bezpieczenstwo/`](docs/bezpieczenstwo/) — klasyfikacja danych, threat model, rejestr ryzyk, RODO, checklista ASVS |
+| Testy i operacje | [`docs/testy/STRATEGIA_TESTOW.md`](docs/testy/STRATEGIA_TESTOW.md), [`docs/operacje/RUNBOOK.md`](docs/operacje/RUNBOOK.md) |
+| Historia zmian | [`CHANGELOG.md`](CHANGELOG.md) |
+
+**Status (2026-10-16):** audyt zakończony; szkielet procesu i bramki CI (lint, testy z pokryciem, bandit, pip-audit,
+gitleaks, trivy, Dependabot) wdrożone; backlog startowy z poprawkami bezpieczeństwa na czele czeka na decyzje PO
+(`docs/analiza/ZALOZENIA.md`).
+
 ## Jak uruchomić
 
 Pełne `requirements.txt` instaluje stos ML/OCR (PyTorch, DocTR…) — kilka GB. Do testów i głównej

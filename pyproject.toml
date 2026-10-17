@@ -26,3 +26,12 @@ ignore = ["F401"]   # nieużywane importy bywają celowe (lazy/optional) — wł
 
 [tool.ruff.format]
 quote-style = "preserve"
+
+# Pokrycie testami (pytest --cov). Raport w CI jest informacyjny; progi per moduł
+# ustala docs/testy/STRATEGIA_TESTOW.md (zapadka: pokrycie nie może spadać).
+[tool.coverage.run]
+omit = ["tests/*", "tools/*", "static/*", "docs/*", "instance/*", "artwork-engine/*"]
+
+[tool.coverage.report]
+skip_empty = true
+precision = 1

@@ -1,14 +1,22 @@
 name: security
 
-# Cotygodniowe skany bezpieczeństwa (doradcze): Bandit (SAST Pythona),
-# gitleaks (sekrety w kodzie i historii), Trivy (CVE w zależnościach
-# i konfiguracji), pip-audit (CVE w requirements). Tylko harmonogram
-# + ręczne odpalenie — oszczędza minuty Actions na prywatnym repo.
+# Skany bezpieczeństwa: na każdym pull requeście i pushu do main (bramki) oraz
+# co miesiąc (pełny przegląd + obraz). Progi: ustalenia HIGH/CRITICAL (bandit: ≥ MEDIUM)
+# blokują. Wyjątki wyłącznie z uzasadnieniem i datą przeglądu: .trivyignore,
+# adnotacje `# nosec <id>` oraz docs/bezpieczenstwo/RYZYKA.md (sekcja „Wyjątki”).
 
 on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
   schedule:
-    - cron: "0 6 1 * *"   # 1. dnia miesiaca
+    - cron: "0 6 1 * *"   # 1. dnia miesiąca
   workflow_dispatch:
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -21,11 +29,45 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
-          python-version: "3.12"
+          python-version: "3.11"
       - name: Instalacja Bandit
         run: pip install "bandit[toml]"
-      - name: Skan (błąd przy problemach ≥ średnie)
-        run: bandit -r . -ll -x ./.venv,./venv,./node_modules,./.git
+      - name: Skan (ustalenia ≥ MEDIUM blokują)
+        run: bandit -r . -ll -x ./.venv,./venv,./node_modules,./.git,./tests,./static
+      - name: Pełny raport JSON (artefakt, wszystkie wagi)
+        if: always()
+        run: bandit -r . -x ./.venv,./venv,./node_modules,./.git,./tests,./static -f json -o bandit.json || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-json
+          path: bandit.json
+          if-no-files-found: ignore
+
+  pip-audit:
+    name: pip-audit (SCA)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"   # jak w Dockerfile — audyt tego, co trafia do obrazu
+      - name: Instalacja pip-audit
+        run: pip install pip-audit
+      - name: Zestaw produkcyjny (blokuje)
+        run: pip-audit -r requirements-prod.txt --progress-spinner off
+      - name: Pełny zestaw ML (doradczo — ciężkie pakiety, część bez kół dla runnera)
+        continue-on-error: true
+        run: pip-audit -r requirements.txt --progress-spinner off
+      - name: Raport JSON (artefakt)
+        if: always()
+        run: pip-audit -r requirements-prod.txt --progress-spinner off -f json -o pip-audit.json || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pip-audit-json
+          path: pip-audit.json
+          if-no-files-found: ignore
 
   gitleaks:
     name: gitleaks (sekrety)
@@ -39,7 +81,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   trivy:
-    name: Trivy (zależności + konfiguracja)
+    name: Trivy (zależności, sekrety, konfiguracja)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -48,26 +90,66 @@ jobs:
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
             | sh -s -- -b "$HOME/.local/bin"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-      - name: Skan repozytorium (raport HIGH/CRITICAL w logu)
-        run: trivy fs --scanners vuln,secret,misconfig --severity HIGH,CRITICAL --exit-code 0 .
+      - name: Skan repozytorium (HIGH/CRITICAL blokują; wyjątki w .trivyignore)
+        run: |
+          trivy fs --scanners vuln,secret,misconfig --severity HIGH,CRITICAL \
+            --ignore-unfixed --ignorefile .trivyignore --exit-code 1 --format table .
+      - name: Raport SARIF (artefakt)
+        if: always()
+        run: |
+          trivy fs --scanners vuln,secret,misconfig --severity HIGH,CRITICAL \
+            --ignore-unfixed --ignorefile .trivyignore --exit-code 0 --format sarif -o trivy-fs.sarif .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-fs-sarif
+          path: trivy-fs.sarif
+          if-no-files-found: ignore
 
-  pip-audit:
-    name: pip-audit (CVE w zależnościach)
+  image:
+    # Budowa cienkiego obrazu (Dockerfile.slim na obrazie bazowym ML z GHCR) i skan Trivy.
+    # Tylko co miesiąc / ręcznie: obraz bazowy ma kilka GB. Do czasu triage'u bazowego
+    # wynik jest DORADCZY (wyjątek E-04 w docs/bezpieczenstwo/RYZYKA.md, przegląd 2026-11-30);
+    # potem --exit-code 1 dla HIGH/CRITICAL z poprawkami (--ignore-unfixed).
+    name: Obraz (build + Trivy) — doradczo
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      packages: read
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
-      - name: Instalacja pip-audit
-        run: pip install pip-audit
-      - name: Audyt plików requirements (doradczy)
+      - name: Zwolnij miejsce na dysku (obraz bazowy z torch/paddle ma kilka GB)
         run: |
-          found=0
-          for f in requirements*.txt; do
-            [ -f "$f" ] || continue
-            found=1
-            echo "── $f ──"
-            pip-audit -r "$f" --progress-spinner off || true
-          done
-          [ "$found" = 1 ] || echo "Brak plików requirements*.txt — pomijam."
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /opt/hostedtoolcache/CodeQL || true
+          df -h /
+      - name: Nazwa właściciela małymi literami (wymóg GHCR)
+        id: meta
+        run: echo "owner_lc=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+      - name: Logowanie do GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build obrazu aplikacji
+        run: |
+          docker build -f Dockerfile.slim \
+            --build-arg ML_BASE_IMAGE=ghcr.io/${{ steps.meta.outputs.owner_lc }}/doccompare-ml-base:latest \
+            -t doccompare:ci .
+      - name: Instalacja Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
+            | sh -s -- -b "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Skan obrazu (HIGH/CRITICAL z dostępną poprawką)
+        run: |
+          trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 --format table doccompare:ci
+          trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 --format sarif -o trivy-image.sarif doccompare:ci
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-image-sarif
+          path: trivy-image.sarif
+          if-no-files-found: ignore

@@ -1,7 +1,11 @@
 name: CI — testy jednostkowe
 
-# Bramka jakości: uruchamia zestaw testów pytest na każdym pushu do main / claude-*
-# oraz na pull requestach. Pokrywa czystą logikę biznesową (normalizer, barcode_validator).
+# Bramka jakości na pushu do main i na pull requestach:
+#   1) lint (ruff): bramka BLOKUJĄCA na regułach, które repo już spełnia („zapadka”),
+#      plus raport doradczy z pełną konfiguracją z pyproject.toml,
+#   2) kompilacja składni całego repo + pytest z raportem pokrycia i listą pominięć.
+# Skany bezpieczeństwa (bandit, pip-audit, gitleaks, trivy) są w security.yml.
+# UWAGA: nazwa tego workflow jest używana przez deploy.yml (workflow_run) — nie zmieniać.
 
 on:
   push:
@@ -17,13 +21,38 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-# Najmniejsze uprawnienia — ten workflow tylko czyta repo (nie mergu­je, nie
-# pushuje).
+# Najmniejsze uprawnienia — ten workflow tylko czyta repo.
 permissions:
   contents: read
 
 jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Konfiguracja Pythona
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalacja ruff
+        run: pip install "ruff==0.16.8"
+
+      - name: Zapadka — reguły już spełniane (blokuje)
+        # F841/F541/F601/F811 mają znany dług (90 ustaleń, US-019); po jego spłacie
+        # usuwamy je z --ignore, żeby bramka się zacieśniała, nigdy nie luzowała.
+        # F401 ignorowane celowo (leniwe / opcjonalne importy — patrz pyproject.toml).
+        run: ruff check . --select F,E9,W6 --ignore F401,F841,F541,F601,F811 --output-format github
+
+      - name: Pełna konfiguracja z pyproject.toml (doradczo)
+        continue-on-error: true
+        run: ruff check . --output-format concise --statistics
+
   pytest:
+    name: Testy (pytest + pokrycie)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,19 +64,26 @@ jobs:
           python-version: '3.11'
 
       - name: Kompilacja składni całego repo
-        # Łapie błędy składni w KAŻDYM module (nie tylko importowanym przez testy),
-        # więc np. literówka w app.py nie przejdzie przez bramkę na produkcję.
+        # Łapie błędy składni w KAŻDYM module (nie tylko importowanym przez testy).
         run: python -m compileall -q . -x 'static/design|\.git'
 
       - name: Instalacja zależności testowych
-        # Lekki zestaw — testy obejmują wyłącznie czyste funkcje i nie wymagają
-        # ciężkich zależności ML (torch / paddleocr / transformers) z requirements.txt,
-        # dzięki czemu CI kończy się w kilka sekund. pandas jest wymagany: bez niego
-        # ekstrakcja pozycji z tabel po cichu zwraca 0 pozycji (#1).
-        run: pip install pytest python-dateutil dateparser babel flask werkzeug pydantic pypdf reportlab pdfplumber rapidfuzz numpy "pandas>=2.0"
+        # dev-requirements.txt = narzędzia + lekkie zależności testów. Reszta to
+        # minimalny zestaw runtime bez ciężkich pakietów ML (torch/paddle/transformers),
+        # dzięki czemu CI kończy się w kilkadziesiąt sekund. pandas jest wymagany:
+        # bez niego ekstrakcja pozycji z tabel po cichu zwraca 0 pozycji (#1).
+        run: |
+          pip install -r dev-requirements.txt
+          pip install flask werkzeug pypdf reportlab pdfplumber rapidfuzz numpy "pandas>=2.0" pytest-cov
 
-      - name: Uruchomienie testów
-        run: python -m pytest tests/ -q
+      - name: Testy z raportem pokrycia i listą pominięć
+        # -rs: każdy pominięty test jest widoczny w logu (136 importorskip w suite).
+        run: python -m pytest tests/ -q -rs --cov=. --cov-report=term --cov-report=xml:coverage.xml
 
-  # pip-audit usunięty stąd — był doradczy i dublował się z security.yml (miesięczny
-  # cron: bandit + gitleaks + trivy + pip-audit). Palił minuty przy każdym pushu.
+      - name: Artefakt — raport pokrycia
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+          if-no-files-found: ignore

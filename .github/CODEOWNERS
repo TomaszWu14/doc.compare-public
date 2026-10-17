@@ -1,0 +1,30 @@
+# CODEOWNERS — przypisanie obszarów do ról (opisowo).
+# GitHub wymaga tu realnych kont; jedynym opiekunem repozytorium jest właściciel,
+# który występuje w roli PO i zatwierdza merge. Komentarze mówią, która rola
+# (BA / DEV / SEC) prowadzi przegląd danego obszaru zgodnie z CONTRIBUTING.md.
+
+# Domyślnie — właściciel repozytorium (PO)
+*                                   @TomaszWu14
+
+# [BA] analiza i wymagania
+/docs/analiza/                      @TomaszWu14
+/docs/01-problem-i-zakres.md        @TomaszWu14
+/docs/05-wymagania.md               @TomaszWu14
+
+# [DEV] architektura, kod, testy, operacje
+/docs/architektura/                 @TomaszWu14
+/docs/testy/                        @TomaszWu14
+/docs/operacje/                     @TomaszWu14
+/core/                              @TomaszWu14
+/blueprints/                        @TomaszWu14
+/tests/                             @TomaszWu14
+
+# [SEC] bezpieczeństwo — przegląd obowiązkowy
+/docs/bezpieczenstwo/               @TomaszWu14
+/SECURITY.md                        @TomaszWu14
+/core/security.py                   @TomaszWu14
+/blueprints/auth.py                 @TomaszWu14
+/pdf_validation.py                  @TomaszWu14
+/.github/workflows/                 @TomaszWu14
+/Dockerfile*                        @TomaszWu14
+/.trivyignore                       @TomaszWu14

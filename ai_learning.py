@@ -22,9 +22,12 @@ CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
 CLAUDE_MODEL   = os.environ.get("AI_LEARNING_MODEL", "claude-sonnet-4-6")
 DB_PATH        = "instance/doccompare.db"
 
+from core.prompt_safety import UNTRUSTED_DATA_RULE, sanitize, wrap_untrusted  # noqa: E402
+
 _SYSTEM = """Jesteś ekspertem ds. dokumentacji handlowej ACME.
 Analizujesz strukturę dokumentów i tworzysz profile dostawców.
-Odpowiadaj WYŁĄCZNIE w JSON — bez markdown, bez komentarzy."""
+Odpowiadaj WYŁĄCZNIE w JSON — bez markdown, bez komentarzy.
+""" + UNTRUSTED_DATA_RULE   # US-026: treść dokumentu = dane, nie polecenia
 
 # ── Klucz API ────────────────────────────────────────────────────────────────
 
@@ -146,9 +149,12 @@ _DOC_PROMPT = """Przeanalizuj dokument handlowy ACME i zwróć profil dostawcy.
 TEKST NAGŁÓWKOWY:
 {header}
 
-NAGŁÓWEK TABELI ({n} kolumn): {th}
-PRZYKŁADOWE WIERSZE: {tr}
-TOTAL: {tot}
+NAGŁÓWEK TABELI ({n} kolumn):
+{th}
+PRZYKŁADOWE WIERSZE:
+{tr}
+TOTAL:
+{tot}
 
 ZASADY MAPOWANIA KOLUMN:
 - "Quantity/Unit" lub "Qty" → "qty"  (NIE "unit")
@@ -202,12 +208,15 @@ def learn_from_document(pdf_path: str, doc_type_hint: str = "auto",
     if not s["header_text"] and not s["table_header"]:
         return {"status": "error", "message": "Nie udało się wyciągnąć tekstu z PDF"}
 
+    # US-026: każda część pochodząca z PDF jest sanityzowana i opakowana jako dane niezaufane.
+    def _cells(row):
+        return [sanitize(c, max_len=120) for c in (row or [])]
     prompt = _DOC_PROMPT.format(
-        header=s["header_text"][:3000],
+        header=wrap_untrusted("naglowek_pdf", sanitize(s["header_text"], max_len=3000, keep_newlines=True)),
         n=len(s["table_header"]),
-        th=json.dumps(s["table_header"], ensure_ascii=False),
-        tr=json.dumps(s["table_rows"], ensure_ascii=False),
-        tot=json.dumps(s["total_row"], ensure_ascii=False),
+        th=wrap_untrusted("naglowek_tabeli", json.dumps(_cells(s["table_header"]), ensure_ascii=False)),
+        tr=wrap_untrusted("wiersze_tabeli", json.dumps([_cells(r) for r in s["table_rows"]], ensure_ascii=False)),
+        tot=wrap_untrusted("wiersz_sumy", json.dumps(_cells(s["total_row"]), ensure_ascii=False)),
     )
     ai = _call(prompt)
     if "error" in ai:
@@ -317,7 +326,8 @@ PROFIL:
 ZNALEZISKA:
 {findings}
 
-AI OCENA: {ai_sum}
+AI OCENA:
+{ai_sum}
 
 Oceń czy wzorce znalezisk wskazują na potrzebę aktualizacji profilu.
 Odpowiedz WYŁĄCZNIE w JSON:
@@ -348,12 +358,13 @@ def learn_from_comparison(comparison_result: dict, supplier_code: str,
         for it in (modules.get(mod,{}).get("items",[]) or
                    modules.get(mod,{}).get("compared",[]) or [])[:20]:
             if it.get("status") not in ("ok","format"):
-                findings.append(f"[{it.get('status','?')}] {it.get('ref','?')}: "
-                                 f"{'; '.join(str(i) for i in (it.get('issues') or [])[:3])}")
+                findings.append(sanitize(f"[{it.get('status','?')}] {it.get('ref','?')}: "
+                                         f"{'; '.join(str(i) for i in (it.get('issues') or [])[:3])}",
+                                         max_len=300))
     for h in (modules.get("enhanced",{}).get("headers",[]) or []):
         if h.get("status") not in ("ok","format"):
-            findings.append(f"[{h.get('status')}] {h.get('key','')}: "
-                             f"{h.get('val_a','')} vs {h.get('val_b','')}")
+            findings.append(sanitize(f"[{h.get('status')}] {h.get('key','')}: "
+                                     f"{h.get('val_a','')} vs {h.get('val_b','')}", max_len=300))
 
     if not findings:
         return {"status":"no_updates","supplier":supplier_code,
@@ -366,8 +377,8 @@ def learn_from_comparison(comparison_result: dict, supplier_code: str,
                             if k in ("price_rounding","po_rounding","price_tolerance_pct",
                                      "payment_terms_map","known_issues","column_mappings","date_format")},
                            ensure_ascii=False, indent=2),
-        findings="\n".join(findings[:30]),
-        ai_sum=ai_sum or "Brak",
+        findings=wrap_untrusted("znaleziska", "\n".join(findings[:30])),
+        ai_sum=wrap_untrusted("ocena_ai", sanitize(ai_sum, max_len=1000) or "Brak"),
     )
     ai = _call(prompt, max_tokens=2000)
     if "error" in ai:

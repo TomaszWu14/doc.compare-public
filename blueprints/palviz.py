@@ -8,6 +8,7 @@ Tabelę dieline_templates „posiada" ten moduł (ensure_dieline_templates_table
 """
 from __future__ import annotations
 
+import logging
 import os
 import uuid
 
@@ -18,6 +19,8 @@ from werkzeug.utils import secure_filename
 from db import get_db
 from core.security import login_required, require_role, csrf_protect, can_see_all
 from core.audit import log_audit
+
+logger = logging.getLogger("doccompare")
 
 bp = Blueprint("palviz", __name__)
 
@@ -121,13 +124,20 @@ def api_palviz_generate():
             "pkg_type": res["pkg_type"], "faces_written": res["faces_written"],
             "warnings": res["warnings"],
         })
-    except Exception as e:
-        import traceback
-        return jsonify({"error": str(e), "detail": traceback.format_exc()[-500:]}), 500
+    except Exception:
+        return _internal_error("palviz_generate")
     finally:
         shutil.rmtree(work, ignore_errors=True)
         try: os.remove(pdf_path)
         except OSError: pass
+
+
+def _internal_error(where):
+    """US-027: odpowiedź 500 bez tracebacku i treści wyjątku; szczegóły tylko w logu serwera."""
+    err_id = uuid.uuid4().hex[:8]
+    logger.exception("palviz %s failed error_id=%s", where, err_id)
+    return jsonify({"error": f"Błąd przetwarzania pliku. Zgłoś identyfikator: {err_id}",
+                    "error_id": err_id}), 500
 
 
 def _serve(subdir, name, mimetype, attach=False):
@@ -203,8 +213,10 @@ def api_palviz_batch():
                 items.append({"sku": sku, "glb_url": url_for("palviz.palviz_glb", name=glb_name),
                               "dims_mm": res["dims_mm"], "faces_written": res["faces_written"],
                               "warnings": res["warnings"]})
-            except Exception as e:
-                items.append({"sku": sku, "error": str(e)})
+            except Exception:
+                err_id = uuid.uuid4().hex[:8]
+                logger.exception("palviz batch item failed sku=%s error_id=%s", sku, err_id)
+                items.append({"sku": sku, "error": f"Błąd przetwarzania (id: {err_id})"})
             finally:
                 try: os.remove(pdf_path)
                 except OSError: pass
@@ -230,11 +242,9 @@ def templates_page():
 
 
 @bp.route("/api/artwork/templates/analyze", methods=["POST"])
-@login_required
+@require_role("manager")   # US-001: dekorator — wcześniej `if not require_role(...)` nigdy nie sprawdzał roli
 @csrf_protect
 def api_templates_analyze():
-    if not require_role("manager"):
-        return jsonify({"error": "Brak uprawnień"}), 403
     file = request.files.get("file")
     if not file or not file.filename.lower().endswith(".pdf"):
         return jsonify({"error": "Wymagany plik PDF"}), 400
@@ -265,9 +275,8 @@ def api_templates_analyze():
             "existing_panels": existing.panels if existing else None,
             "existing_orient": (existing.orient if existing else None) or {},
         })
-    except Exception as e:
-        import traceback
-        return jsonify({"error": str(e), "detail": traceback.format_exc()[-500:]}), 500
+    except Exception:
+        return _internal_error("templates_analyze")
     finally:
         try: os.remove(pdf_path)
         except OSError: pass
@@ -276,16 +285,14 @@ def api_templates_analyze():
 @bp.route("/artwork/templates/preview/<name>")
 @login_required
 def templates_preview(name):
-    d = os.path.abspath(os.path.join(_upload_dir(), "tpl_preview"))
-    return send_from_directory(d, secure_filename(name), mimetype="image/png")
+    # US-027: jak pozostałe pliki PalViz — tylko własne (prefiks uid) albo superuser/admin.
+    return _serve("tpl_preview", name, "image/png")
 
 
 @bp.route("/api/artwork/templates/save", methods=["POST"])
-@login_required
+@require_role("manager")   # US-001: dekorator — wcześniej `if not require_role(...)` nigdy nie sprawdzał roli
 @csrf_protect
 def api_templates_save():
-    if not require_role("manager"):
-        return jsonify({"error": "Brak uprawnień"}), 403
     d = request.get_json(silent=True) or {}
     sig_key = (d.get("sig_key") or "").strip()
     regions = d.get("regions") or {}

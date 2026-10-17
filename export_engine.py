@@ -122,10 +122,19 @@ def _safe(v, default=''):
 
 _FORMULA_PREFIXES = ('=', '+', '-', '@', '\t', '\r')
 
+
+def formula_safe(v) -> str:
+    """Neutralizuje formułę w komórce arkusza (XLSX/CSV): prefiks apostrofu dla = + - @ \\t \\r.
+
+    Wspólne dla eksportu Excel (_xsafe) i CSV (US-027). Nie zmienia innych wartości.
+    """
+    s = "" if v is None else str(v)
+    return ("'" + s) if (s and s[0] in _FORMULA_PREFIXES) else s
+
+
 def _xsafe(v, default=''):
     """Jak _safe, ale zabezpiecza przed Excel formula injection (prefix apostrofem)."""
-    s = _safe(v, default)
-    return ("'" + s) if (s and s[0] in _FORMULA_PREFIXES) else s
+    return formula_safe(_safe(v, default))
 
 
 def _safe_para(v, default='—'):

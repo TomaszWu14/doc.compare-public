@@ -1,0 +1,21 @@
+# Założenia do potwierdzenia
+
+> [BA] Zgodnie z zasadą: gdy PO nie odpowiada, BA przyjmuje bezpieczne, minimalne założenie i zapisuje je tutaj.
+> PO potwierdza (✅), zmienia (✏️) lub odrzuca (❌). Pytania źródłowe: `docs/AUDYT.md` §5.
+
+| ID | Założenie | Dlaczego bezpieczne / minimalne | Skutek, jeśli błędne | Pytanie | Status |
+|---|---|---|---|---|---|
+| Z-01 | **PDF zamówienia jest wzorcem** do kontroli PI/CI; integracja z SAP pozostaje poza zakresem (jak D-12). | Nie wymaga nowych integracji ani danych; zgodne z kodem. | Trzeba zaplanować odczyt z SAP BW i przebudować źródło wzorca. | 1 | do potwierdzenia |
+| Z-02 | **Użytkownicy wewnętrzni to Zakupy i Transport** na rolach `user`/`manager`; Magazyn i Księgowość nie logują się. **Portale zewnętrzne traktujemy jak produkcyjne** (chronimy i testujemy). | Ochrona portali nic nie kosztuje biznesowo, a brak ochrony byłby ryzykiem. | Nowe role (np. Specjalista, Magazyn) i inny podział działów. | 2 | do potwierdzenia |
+| Z-03 | **Bramki steppera i checklista celna są kontrolami obowiązkowymi**: obejścia traktujemy jako błędy (Must). | Bezpieczniejsza interpretacja; łatwiej poluzować niż zaostrzyć. | Część historyjek US-008/US-009 spada do Should lub znika. | 3 | do potwierdzenia |
+| Z-04 | **Zakres = obecny kod + domknięcie bramek.** Portal ETD, bramka MIR7, alerty e-mail i komplety dokumentów pozostają wizją. | Nie budujemy funkcji bez decyzji. | Backlog rośnie o moduły z `PROCES_ZAKUPY_FLOW.md`. | 4 | do potwierdzenia |
+| Z-05 | **Brak liczb bazowych** → cele jakościowe; wartości NFR (p95 < 2 s, ≤ 60 s porównanie, 10 użytkowników, RPO 24 h / RTO 4 h) to propozycje. | Nie blokują pracy; łatwe do zmiany. | Inne progi wydajności i SLA. | 5 | do potwierdzenia |
+| Z-06 | **Retencja**: `audit_log` 12 miesięcy, powiadomienia 6 miesięcy, uploads 24 h (jest). | Typowe okresy dla narzędzia wewnętrznego; krótsze niż obecne „bez końca”. | Inne okresy (np. wymóg 5 lat dla dokumentów celnych dotyczy dokumentów, nie logów aplikacji). | SEC | do potwierdzenia |
+| Z-07 | **Treść dokumentów może nadal trafiać do Anthropic i Mistral** (stan obecny), ale bez danych osobowych i z zapisem w `RODO.md`; tryb „bez chmury” istnieje (brak kluczy). | Utrzymuje działanie; nie rozszerza zakresu danych. | Wymóg wyłączenia AI/OCR w chmurze → feature flag per instancja. | SEC | do potwierdzenia |
+| Z-08 | **Pokrycie testami**: raport bez progu, zapadka per moduł; cel 80% dla logiki domenowej. | Nie blokuje CI na starcie; kierunek jasny. | Inny próg lub bramka od razu. | DEV | do potwierdzenia |
+| Z-09 | **Martwego kodu nie usuwamy** do decyzji PO; oznaczamy w dokumentacji (`alert_engine.py`, `yolo_detector.py`, 5 szablonów, `/kolejka`). | Odwracalne, zero ryzyka regresji. | Dług zostaje dłużej. | DEV | do potwierdzenia |
+| Z-10 | **Commity po angielsku** (Conventional Commits), dokumentacja po polsku. | Zgodne z 9 z 10 commitów w repo. | Zmiana konwencji od danej daty. | proces | do potwierdzenia |
+| Z-11 | **Push gałęzi roboczych i draft PR bez pytania** przy każdej zmianie; merge tylko po akceptacji PO; brak wdrożeń i migracji na produkcji bez zgody. | Push na gałąź roboczą jest odwracalny; deploy startuje tylko z `main`. | Praca wyłącznie lokalna (ryzyko utraty pracy w sesji chmurowej). | proces | do potwierdzenia |
+| Z-12 | **ASVS poziom 1 jako baza**, poziom 2 dla uwierzytelniania, sesji i kontroli dostępu. | Realistyczny start dla narzędzia wewnętrznego z danymi poufnymi. | Pełny L2 → więcej historyjek SEC. | SEC | do potwierdzenia |
+| Z-13 | **Kontener działa jako root do czasu US-022**; wyjątek E-01 w `RYZYKA.md` z przeglądem 2026-11-30. | Zmiana użytkownika bez testu wolumenu `/data` może zepsuć produkcję. | — | SEC | do potwierdzenia |
+| Z-14 | **Zapadki w CI** (ruff bez 4 reguł, trivy image doradczo) są tymczasowe i mają historyjki (US-019, US-022). | Nie luzują kontroli względem stanu sprzed PR #11; zacieśniają się wraz ze spłatą długu. | — | DEV/SEC | do potwierdzenia |
