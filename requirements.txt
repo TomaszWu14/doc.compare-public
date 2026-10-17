@@ -22,7 +22,7 @@ rapidocr-onnxruntime>=1.3      # RapidOCR: modele Paddle w ONNX — samowystarcz
 paddlepaddle                   # Framework Baidu (CPU) — wymagany przez PaddleOCR (fallback po RapidOCR)
 paddleocr>=2.7                 # PaddleOCR: najwyższa dokładność na drukowanym tekście (85-90%)
 easyocr>=1.7                   # Neural OCR: 80+ języków — fallback dla cyrylicy i trudnych cropów
-python-doctr[torch]>=0.9       # DocTR: głęboki OCR — tertiary fallback (wysokie recall na etykietach)
+python-doctr[torch]>=1.1.0       # DocTR: głęboki OCR — tertiary fallback (wysokie recall na etykietach)
 pdf2image>=1.16                # PDF → obrazy dla OCR
 pillow>=10.0,<12.0             # Przetwarzanie obrazów
 opencv-python-headless>=4.8
