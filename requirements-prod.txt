@@ -19,7 +19,7 @@ sentry-sdk[flask]>=2.0
 # ── PDF extraction ────────────────────────────────────────────────────────────
 pdfplumber>=0.10
 pymupdf>=1.24
-pypdf>=3.0
+pypdf>=6.20.1
 camelot-py>=0.11
 
 # ── OCR (basic — Tesseract via system package) ────────────────────────────────
