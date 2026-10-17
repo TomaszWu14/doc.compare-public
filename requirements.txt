@@ -13,7 +13,7 @@ sentry-sdk[flask]>=2.0        # Error tracking
 # ── PDF ekstrakcja ─────────────────────────────────────
 pdfplumber>=0.10,<1.0
 pymupdf>=1.24,<2.0             # PyMuPDF — najszybsza ekstrakcja PDF
-pypdf>=3.0,<5.0                # PDF page extraction (split-compare, field-queue)
+pypdf>=6.20.1,<7.0                # PDF page extraction (split-compare, field-queue)
 camelot-py>=0.11               # Tabele z PDF
 
 # ── OCR ────────────────────────────────────────────────
