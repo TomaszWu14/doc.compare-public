@@ -121,7 +121,7 @@ _ALIGN_ENABLED    = _env_flag("ARTWORK_ALIGN")
 # Lift the fixed DIFF_THRESH by the measured per-page noise floor so anti-alias /
 # print noise never registers as a region.
 _ADAPTIVE_THRESH  = _env_flag("ARTWORK_ADAPTIVE_THRESH")
-# Run the slow local OCR models (Qwen/Paddle/EasyOCR/Surya/DocTR). When off, the
+# Run the slow local OCR models (Qwen/Paddle/EasyOCR/DocTR). When off, the
 # cascade is API engines (Claude/Mistral) → Tesseract only, avoiding the chain of
 # 30 s timeouts when no API key is configured. Default on.
 _OCR_LOCAL_ENGINES = _env_flag("ARTWORK_OCR_LOCAL", "0")
@@ -1273,77 +1273,6 @@ def _doctr_readtext(img) -> str:
         return "\n".join(lines).strip()
     except Exception as exc:
         logger.debug("DocTR readtext failed: %s", exc)
-        return ""
-
-
-# ── Surya layout-aware OCR singleton ──────────────────────────────────────────
-
-_surya_det_model      = None
-_surya_det_processor  = None
-_surya_rec_model      = None
-_surya_rec_processor  = None
-_surya_lock           = _threading.Lock()
-
-
-def _get_surya():
-    """Lazy Surya singleton — layout-aware OCR with reading-order detection."""
-    global _surya_det_model, _surya_det_processor
-    global _surya_rec_model, _surya_rec_processor
-    if _surya_det_model is not None:
-        return ((_surya_det_model, _surya_det_processor,
-                 _surya_rec_model, _surya_rec_processor)
-                if _surya_det_model else (None, None, None, None))
-    with _surya_lock:
-        if _surya_det_model is not None:
-            return ((_surya_det_model, _surya_det_processor,
-                     _surya_rec_model, _surya_rec_processor)
-                    if _surya_det_model else (None, None, None, None))
-        try:
-            from surya.model.detection.segformer import (
-                load_model as _sd_model, load_processor as _sd_proc)
-            from surya.model.recognition.model import load_model as _sr_model
-            from surya.model.recognition.processor import (
-                load_processor as _sr_proc)
-            _det_m               = _sd_model()   # load into temp var first
-            _surya_det_processor = _sd_proc()
-            _surya_rec_model     = _sr_model()
-            _surya_rec_processor = _sr_proc()
-            _surya_det_model     = _det_m        # sentinel set last — prevents TOCTOU race
-            logger.info("Surya OCR models initialised")
-        except Exception as exc:
-            logger.warning("Surya unavailable: %s", exc)
-            _surya_det_model = False
-    return ((_surya_det_model, _surya_det_processor,
-             _surya_rec_model, _surya_rec_processor)
-            if _surya_det_model else (None, None, None, None))
-
-
-def _surya_readtext(img) -> str:
-    """Surya layout-aware OCR — detects reading order before recognition.
-    Returns plain text lines joined by newlines."""
-    det_model, det_processor, rec_model, rec_processor = _get_surya()
-    if det_model is None:
-        return ""
-    try:
-        from surya.ocr import run_ocr
-        langs = [["pl", "en", "de", "fr", "es", "it", "pt", "nl",
-                  "cs", "sk", "hu", "ro", "hr", "sl",
-                  "et", "lv", "lt", "fi", "sv", "no", "da",
-                  "uk", "ru", "bg"]]
-        predictions = run_ocr(
-            [img], langs,
-            det_model, det_processor,
-            rec_model, rec_processor,
-        )
-        if not predictions:
-            return ""
-        lines = [
-            line.text for line in predictions[0].text_lines
-            if line.text and line.text.strip()
-        ]
-        return "\n".join(lines).strip()
-    except Exception as exc:
-        logger.debug("Surya readtext failed: %s", exc)
         return ""
 
 
@@ -3119,7 +3048,7 @@ def _ocr_tall_in_strips(img, auto_orient: bool = True) -> str:
 
 
 def _extract_text_ocr_uncached(img, auto_orient: bool = True, _allow_strips: bool = True) -> str:
-    """OCR cascade — 8 layers ordered by accuracy, with graceful fallback.
+    """OCR cascade — 7 layers ordered by accuracy, with graceful fallback.
 
     Hierarchy:
       1. Claude Vision      — best accuracy, context-aware, 0/O 1/I safe
@@ -3127,9 +3056,9 @@ def _extract_text_ocr_uncached(img, auto_orient: bool = True, _allow_strips: boo
       3. Qwen2.5-VL-3B     — best local VLM, 96%+ DocVQA
       4. PaddleOCR          — fast, 85-90% on printed text, orientation-aware
       5. EasyOCR            — 80+ languages, difficult crops
-      6. Surya              — layout-aware, reading-order detection
-      7. DocTR              — deep-learning, complex multi-column layouts
-      8. Tesseract          — universal fallback, always available
+      6. DocTR              — deep-learning, complex multi-column layouts
+      7. Tesseract          — universal fallback, always available
+    (Surya removed in US-029: it pinned pillow<11 and transformers<5.)
     """
     # Gęsty/wysoki blok tekstu jako JEDEN obraz traci detale (patrz _ocr_tall_in_strips)
     # → tniemy na pasy i OCR-ujemy każdy osobno. Tylko dla wyraźnie pionowych, dużych
@@ -3206,15 +3135,7 @@ def _extract_text_ocr_uncached(img, auto_orient: bool = True, _allow_strips: boo
             except Exception as exc:
                 logger.debug("EasyOCR failed: %s", exc)
 
-        # ── 6. Surya — layout-aware, reading-order detection ──────────────────
-        try:
-            text = _surya_readtext(img)
-            if text:
-                return text
-        except Exception as exc:
-            logger.debug("Surya failed: %s", exc)
-
-        # ── 7. DocTR — deep-learning OCR, handles complex multi-column layouts ─
+        # ── 6. DocTR — deep-learning OCR, handles complex multi-column layouts ─
         try:
             text = _doctr_readtext(img)
             if text:

@@ -24,7 +24,7 @@ paddleocr>=2.7                 # PaddleOCR: najwyższa dokładność na drukowan
 easyocr>=1.7                   # Neural OCR: 80+ języków — fallback dla cyrylicy i trudnych cropów
 python-doctr[torch]>=0.9       # DocTR: głęboki OCR — tertiary fallback (wysokie recall na etykietach)
 pdf2image>=1.16                # PDF → obrazy dla OCR
-pillow>=10.2,<11.0             # Przetwarzanie obrazów; capped <11 by surya-ocr (known CVEs until 12.3 — US-029)
+pillow>=12.3,<13.0             # Przetwarzanie obrazów; <12.3 has known CVEs
 opencv-python-headless>=4.8
 
 # ── Analiza wizualna (artwork diff) ──────────────────────
@@ -35,7 +35,7 @@ imagehash>=4.3                 # Perceptual hashing — szybki pre-filtr "czy ob
 # lightglue not on PyPI — install from upstream repo (cvg/LightGlue)
 # Pinned to a specific commit SHA for supply-chain safety (update deliberately):
 lightglue @ git+https://github.com/cvg/LightGlue.git@eb42fee2d71449efb0aa5c10549752b5d75384d8
-transformers>=4.40             # HuggingFace — DINOv2 similarity + Table Transformer detection
+transformers>=5.12.1,<6.0     # HuggingFace — DINOv2 similarity + Table Transformer detection; <5.12.1 has known CVEs
 torch>=2.1                     # PyTorch CPU — wymagany przez LightGlue, DINOv2, Table Transformer, DocTR
 
 # ── YOLOv8 (detekcja elementów pakowania) ───────────────
@@ -72,9 +72,6 @@ python-dotenv>=1.0.0
 # ── Semantic similarity + vector search ─────────────────
 sentence-transformers>=3.0    # SBERT multilingual embeddings for product matching
 faiss-cpu>=1.8                # Fast approximate NN search for SBERT index
-
-# ── Layout-aware OCR ────────────────────────────────────
-surya-ocr>=0.6,<0.7           # Reading-order detection + OCR (between EasyOCR and DocTR)
 
 # ── Structured table extraction from images ──────────────
 img2table>=1.2                # Cell-level table parsing (supplements Table Transformer)

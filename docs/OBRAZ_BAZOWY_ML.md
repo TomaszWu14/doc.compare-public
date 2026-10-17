@@ -8,7 +8,7 @@
 ## Dlaczego deploy trwa 7-8 min
 
 W oryginalnym `Dockerfile` każdy build instaluje od zera: CPU-PyTorch (~1 GB),
-`paddlepaddle`, `easyocr`, `doctr`, `surya`, `transformers`, `ultralytics` oraz
+`paddlepaddle`, `easyocr`, `doctr`, `transformers`, `ultralytics` oraz
 dwa pakiety z `git+https://` (LightGlue, GroundingDINO, które trzeba sklonować).
 Jeśli Coolify nie reużywa cache warstw między deployami, ta warstwa liczy się
 za każdym razem — stąd 7-8 min. **Porównywarka dokumentów jest lekka** (pdfplumber,
