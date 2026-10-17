@@ -1089,6 +1089,13 @@ def _generate_ai_comment(report: "ArtworkReport") -> str:
     api_key = _get_api_key().strip()
     if not api_key:
         return ""
+    # Komentarz jest opcjonalny: po przekroczeniu miesięcznego budżetu AI pomijamy go (US-006).
+    try:
+        from api_usage_tracker import budget_allows_optional_ai
+        if not budget_allows_optional_ai():
+            return ""
+    except Exception:
+        pass
 
     matched_str = "\n".join(f"• {m}" for m in report.matched_items) or "—"
     diffs_str   = "\n".join(f"• {d}" for d in report.diff_items)     or "—"
@@ -1123,6 +1130,11 @@ def _generate_ai_comment(report: "ArtworkReport") -> str:
         # bandit: URL to stała https:// w kodzie
         with _ur.urlopen(req, timeout=30) as resp:  # nosec B310
             data = json.loads(resp.read())
+        try:
+            from api_usage_tracker import record_usage
+            record_usage(_DEFAULT_REPORT_MODEL, data.get("usage"), call_type="artwork_report_comment")
+        except Exception:
+            pass
         content = data.get("content") or []
         return (content[0].get("text") or "").strip() if content else ""
     except Exception:

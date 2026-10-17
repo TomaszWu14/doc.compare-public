@@ -15,6 +15,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_valida
 
 from db import get_db
 from core.security import login_required, require_role, csrf_protect, is_admin
+from core.rate_limit import heavy_rate_limit
 from core.audit import log_audit as _log_audit
 from core.validation import validate_body
 from pdf_validation import validate_pdf_upload as _validate_pdf_upload
@@ -307,6 +308,7 @@ def supplier_wizard_edit(sid):
 @bp.route("/api/suppliers/preview_table", methods=["POST"])
 @require_role("admin")
 @csrf_protect
+@heavy_rate_limit
 def api_suppliers_preview_table():
     """
     Przyjmuje plik PDF, zwraca podgląd tabeli produktów z auto-detekcją kolumn.
