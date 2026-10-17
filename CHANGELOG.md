@@ -22,6 +22,10 @@ Wersja aplikacji: `constants.APP_VERSION`.
 - `tests/conftest.py`: konto testowe `it_user` i fixture `user_client` (testy „brak dostępu” dla najniższej roli).
 - `security.yml` uruchamia się także na PR i pushu do `main` (dotąd tylko co miesiąc); Python 3.11 jak w produkcji.
 
+### Fixed
+
+- CI: deploy demo do Coolify — przy odpowiedzi 405 na GET ponawia wywołanie metodą POST i loguje kod HTTP (deploy po merge #11 nie ruszył).
+
 ### Security
 - **US-026 / R-08:** treść dokumentów w promptach AI jest danymi — nowy `core/prompt_safety.py`
   (`sanitize`, `wrap_untrusted`, reguła w prompcie systemowym); `ai_learning` sanityzuje i opakowuje nagłówek PDF,
