@@ -24,6 +24,7 @@ from pydantic import BaseModel, Field, ValidationError, model_validator
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from core.audit import log_audit as _log_audit
+from core.demo import DEMO_ROLE, demo_enabled, ensure_demo_user
 from core.security import csrf_protect, login_required, verify_csrf
 from core.timeutil import ts_ago as _ts_ago
 from db import get_db
@@ -217,6 +218,29 @@ def login():
         if remaining_tries < 3:
             error += f" Pozostało prób: {remaining_tries}"
     return render_template("login.html", error=error)
+
+
+@bp.route("/login/demo", methods=["POST"])
+@csrf_protect
+def login_demo():
+    """„Wejdź jako demo”: sesja tylko do odczytu (core/demo.py). Bez DEMO_LOGIN → 404."""
+    if not demo_enabled():
+        return ("Nie znaleziono", 404)
+    db = get_db()
+    try:
+        user = dict(ensure_demo_user(db))
+    finally:
+        db.close()
+    session.clear()
+    session.permanent = True
+    session["user_id"] = user["id"]
+    session["username"] = user["username"]
+    session["role"] = DEMO_ROLE          # rola zawsze z kodu, nie z bazy
+    session["department"] = ""
+    session["lang"] = "pl"
+    session["demo_readonly"] = True
+    _log_audit("login_demo", user["username"], f"IP {request.remote_addr or 'unknown'}")
+    return redirect(url_for("index"))
 
 
 @bp.route("/set-language/<lang>")

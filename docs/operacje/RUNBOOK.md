@@ -34,6 +34,7 @@ Wymagane: `SECRET_KEY`, `DATABASE_URL` (lub `SQLITE_PATH`), `APP_BASE_URL` (po U
 Opcjonalne: `ANTHROPIC_API_KEY`, `MISTRAL_API_KEY`, `RESEND_API_KEY`/`EMAIL_FROM`, klucze trackingu, `SENTRY_DSN`,
 `REDIS_URL`, `ARTWORK_ENGINE_URL`, `INTAKE_TOKEN`, `INTEGRATION_API_KEY`, `DISABLE_QWEN=1` (hosty < 16 GB RAM),
 `WEB_CONCURRENCY`, `THREADS_PER_WORKER`, `DB_POOL_SIZE`, `LOG_DIR`, `LOG_LEVEL`, `PROXY_COUNT`, `FORCE_HTTPS`.
+`DEMO_LOGIN` (tylko demo): przycisk „Wejdź jako demo” na stronie logowania; sesja tylko do odczytu (każdy zapis → 403).
 Pełna lista z opisami: `.env.example`. Walidator startowy przerywa start produkcji przy niepewnym `SECRET_KEY`.
 
 ## 4. Backup i odtwarzanie

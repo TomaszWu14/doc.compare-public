@@ -100,6 +100,13 @@ input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(91,155,255,.12)
     <button type="submit" class="btn">Zaloguj się →</button>
     {% if error %}<div class="err"><span>⚠</span><span>{{ error }}</span></div>{% endif %}
   </form>
+  {% if demo_login_enabled %}
+  <form method="POST" action="/login/demo" style="margin-top:14px">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn" data-testid="demo-login"
+            style="background:transparent;border:1px solid currentColor">Wejdź jako demo (tylko podgląd) →</button>
+  </form>
+  {% endif %}
 </div>
 </body>
 </html>
