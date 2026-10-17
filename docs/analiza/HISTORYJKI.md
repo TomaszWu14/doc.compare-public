@@ -107,6 +107,7 @@ Then  commit/PR jest odrzucony
 | US-026 | Jako [SEC] chcę, aby `ai_learning.py` delimitował i sanityzował treść PDF tak samo jak `ai_validator`, aby spreparowany dokument nie sterował sugestiami profilu. **Zrealizowane w PR #11.** | SEC-012 | R-08 | nie |
 | US-027 | Jako użytkownik chcę generycznych komunikatów 500 w PalViz, odpowiedzi `/api/ai/status` bez prefiksu klucza, escape formuł w eksporcie CSV materiałów i podglądu szablonów tylko dla właściciela. **Zrealizowane w PR #11.** | SEC-010 | R-10 | nie |
 | US-028 | Jako użytkownik chcę wylogowania przez POST z tokenem CSRF (formularz zamiast linku w 4 szablonach), aby obca strona nie mogła mnie wylogować. Wydzielone z US-027: zmiana UI, ryzyko niskie dzięki `SameSite=Strict`. | SEC-010 | R-10 | nie |
+| US-029 | Jako operator chcę, aby obraz produkcyjny nie zawierał bibliotek ze znanymi podatnościami: aktualizacja `transformers` do 5.x (wymaga podniesienia `surya-ocr` lub jego usunięcia) i blokujący pip-audit dla `requirements.txt`, który instaluje Dockerfile. | SEC-013, SEC-014 | R-15 | nie |
 
 ## Błędy i luki procesu dostawy
 

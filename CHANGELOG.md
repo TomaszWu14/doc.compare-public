@@ -27,6 +27,9 @@ Wersja aplikacji: `constants.APP_VERSION`.
 - CI: deploy demo do Coolify — przy odpowiedzi 405 na GET ponawia wywołanie metodą POST i loguje kod HTTP (deploy po merge #11 nie ruszył).
 
 ### Security
+- **R-15:** obraz produkcyjny (Dockerfile → `requirements.txt`) miał pypdf 4.3.1 z 85 znanymi podatnościami
+  i pillow 10.4.0; podniesione do pypdf ≥6.20.1 i pillow ≥12.3 (wersje, na których CI już testował).
+  Pozostaje transformers 4.57.6 → US-029.
 - **US-006 / R-06:** limit 30 wywołań / 60 s na użytkownika dla 19 kosztownych tras (Claude Vision, OCR skanów,
   render PDF i 3D, batch i porównania artworków, PalViz, podgląd tabeli dostawcy); odpowiedź 429 z `Retry-After`.
   Limiter przeniesiony do `core/rate_limit.py` (dekorator `heavy_rate_limit`, dostępny też dla blueprintów).

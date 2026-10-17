@@ -133,7 +133,7 @@
 | SEC-010 | Logi bez haseł/tokenów; audit log operacji wrażliwych | ⚠️ | jest; brak retencji; traceback w PalViz | Should |
 | SEC-011 | RODO: minimalizacja, retencja, eksport danych osoby, rejestr czynności | ❌ | `RODO.md` 0.1 | Should |
 | SEC-012 | AI: treść użytkownika jako dane, minimalizacja PII, limity kosztów | ⚠️ | `ai_learning.py` bez sanityzacji (R-08); budżet niepełny (R-06) | Should |
-| SEC-013 | Skany bezpieczeństwa blokujące HIGH/CRITICAL w CI | ✅ (PR #11) | `security.yml` | Must |
+| SEC-013 | Skany bezpieczeństwa blokujące HIGH/CRITICAL w CI | ⚠️ | `security.yml`; pip-audit blokuje `requirements-prod.txt`, a obraz instaluje `requirements.txt` (tylko doradczo) — R-15, US-029 | Must |
 | SEC-014 | Zależności przypięte (lock), obraz nie-root, digest obrazu | ❌ | R-07, US-022 | Should |
 | SEC-015 | Link resetu hasła tylko z zaufanej domeny (`APP_BASE_URL` obowiązkowy) | ❌ | R-03 | Must |
 | SEC-016 | Dostęp do obiektów fail-closed (brak właściciela = odmowa) | ❌ | R-04 | Must |
