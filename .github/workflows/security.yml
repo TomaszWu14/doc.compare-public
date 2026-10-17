@@ -26,7 +26,7 @@ jobs:
     name: Bandit (SAST)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
@@ -48,7 +48,7 @@ jobs:
     name: pip-audit (SCA)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - uses: actions/setup-python@v7
         with:
           python-version: "3.11"   # jak w Dockerfile — audyt tego, co trafia do obrazu
@@ -73,7 +73,7 @@ jobs:
     name: gitleaks (sekrety)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0   # pełna historia — skan także starych commitów
       - uses: gitleaks/gitleaks-action@v3
@@ -84,7 +84,7 @@ jobs:
     name: Trivy (zależności, sekrety, konfiguracja)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Instalacja Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
@@ -119,7 +119,7 @@ jobs:
       contents: read
       packages: read
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Zwolnij miejsce na dysku (obraz bazowy z torch/paddle ma kilka GB)
         run: |
           sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /opt/hostedtoolcache/CodeQL || true
