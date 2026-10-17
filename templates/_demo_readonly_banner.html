@@ -1,0 +1,7 @@
+{#- Sesja „Wejdź jako demo” (core/demo.py): stały pasek, żeby nikt nie szukał, czemu zapis nie działa. #}
+{% if demo_readonly %}
+<div role="status" style="position:fixed;left:0;right:0;bottom:0;z-index:9999;padding:8px 16px;text-align:center;
+     background:#0f2a43;color:#fff;font:600 14px/1.4 system-ui,sans-serif">
+  Wersja demo – dane syntetyczne, tylko podgląd. Zapis jest wyłączony.
+</div>
+{% endif %}

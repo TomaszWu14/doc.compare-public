@@ -25,6 +25,7 @@ from core.security import (
 )
 from core.audit import log_audit as _log_audit
 from core.timeutil import ts_ago as _ts_ago
+from core.demo import demo_enabled as _demo_enabled, readonly_guard as _demo_readonly_guard
 from email_helpers import send_reset_email
 from constants import ROLE_LEVEL, VALID_ROLES, EXTERNAL_ROLES, API_RATE_MAX, API_RATE_WINDOW, KPI_CACHE_TTL, MAX_UPLOAD_BYTES, MAX_UPLOAD_MB
 from constants import FORWARDER_ALLOWED_PREFIXES as _FWD_PREFIXES, CUSTOMS_AGENT_ALLOWED_PREFIXES as _AGENCJA_PREFIXES, EXTERNAL_ROLE_HOME as _EXTERNAL_ROLE_HOME
@@ -1390,6 +1391,17 @@ _EXTERNAL_PREFIXES = {
     "forwarder": _FWD_PREFIXES,
     "customs_agent": _AGENCJA_PREFIXES,
 }
+
+
+@app.before_request
+def _demo_readonly():
+    """Sesja „Wejdź jako demo” jest tylko do odczytu — patrz core/demo.py."""
+    return _demo_readonly_guard()
+
+
+@app.context_processor
+def _inject_demo_login():
+    return {"demo_login_enabled": _demo_enabled(), "demo_readonly": bool(session.get("demo_readonly"))}
 
 
 @app.before_request
