@@ -127,15 +127,35 @@ def budget_allows_optional_ai() -> bool:
         return True
 
 
-def record_usage(model: str, usage: dict, call_type: str = "unknown", user_id=None):
+def _current_user_id():
+    """user_id z sesji Flask, gdy wywołanie jest w kontekście żądania; inaczej None."""
+    try:
+        from flask import has_request_context, session
+        if has_request_context():
+            return session.get("user_id")
+    except Exception:
+        pass
+    return None
+
+
+def record_usage(model: str, usage, call_type: str = "unknown", user_id=None):
     """
     Zapisuje jeden wpis do tabeli api_usage.
     usage — słownik z polami input_tokens i output_tokens zwrócony przez API Anthropic.
     Bezpieczne do wywołania z dowolnego wątku; błędy są ciche.
     """
     try:
-        inp = int(usage.get("input_tokens") or 0)
-        out = int(usage.get("output_tokens") or 0)
+        # usage: słownik z REST API albo obiekt `Usage` z SDK anthropic.
+        if usage is None:
+            usage = {}
+        if isinstance(usage, dict):
+            inp = int(usage.get("input_tokens") or 0)
+            out = int(usage.get("output_tokens") or 0)
+        else:
+            inp = int(getattr(usage, "input_tokens", 0) or 0)
+            out = int(getattr(usage, "output_tokens", 0) or 0)
+        if user_id is None:
+            user_id = _current_user_id()
         cost = _cost_usd(model, inp, out)
         from db import get_db
         db = get_db()

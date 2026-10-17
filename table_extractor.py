@@ -623,6 +623,11 @@ def _claude_extract_table(img) -> list:
         )
         if resp.status_code != 200:
             return []
+        try:
+            from api_usage_tracker import record_usage
+            record_usage("claude-sonnet-4-6", resp.json().get("usage"), call_type="table_vision")
+        except Exception:
+            pass
         text = next((c.get("text", "") for c in (resp.json().get("content") or [])
                      if c.get("type") == "text"), "")
         m = re.search(r'\[[\s\S]*\]', text)

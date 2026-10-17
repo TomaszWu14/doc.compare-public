@@ -199,6 +199,11 @@ def _call_claude_vision(img_b64: str, api_key: str) -> dict:
         # bandit: URL to stała https:// w kodzie
         with urllib.request.urlopen(req, timeout=60) as resp:  # nosec B310
             data = json.loads(resp.read().decode())
+        try:
+            from api_usage_tracker import record_usage
+            record_usage(data.get("model") or "claude-sonnet-4-6", data.get("usage"), call_type="scan_extract")
+        except Exception:
+            pass
         _content = data.get("content") or []
         if not _content:
             return {"error": "Empty API response content"}

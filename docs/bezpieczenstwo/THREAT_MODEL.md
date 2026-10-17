@@ -76,7 +76,7 @@ integralność statusów dostawy (bramki), sekrety integracji, dostępność apl
 | T: złośliwy PDF | magic `%PDF`, bez `/Encrypt`, 200 MB, ZIP 20×100 MB, `secure_filename` | walidator nie we wszystkich 49 miejscach `.save(` 🟡 | US-006 (zakres), checklista PR |
 | T: zmiana cudzego porównania | `user_id`/`is_public`/`can_see_all` po pobraniu; bramka działu `before_request` | — ✅ (12 tras sprawdzonych) | — |
 | I: eksfiltracja przez wynik | wyniki per autor/dział | KPI były globalne — naprawione ✅ | — |
-| D: wyczerpanie workerów (2×3) | limit 30/60 s na 12 trasach, `_HEAVY_SEM(3)`, timeout gunicorn 300 s | 22 ciężkie trasy bez limitu 🟡; semafor per proces ⚪ | US-006, US-020 |
+| D: wyczerpanie workerów (2×3) | limit 30/60 s na 12 trasach, `_HEAVY_SEM(3)`, timeout gunicorn 300 s | ciężkie trasy objęte limitem w US-006 ✅; semafor per proces ⚪ | US-020 |
 | T: path traversal przy pobieraniu | `send_from_directory` + prefiks `{uid}_`, `safe_join` | — ✅ po merge (podgląd PalViz przez `_serve` z prefiksem uid, PR #11) | US-027 |
 
 ### F-3 Wywołania AI i OCR (`ai_validator`, `ai_learning`, `table_extractor`, `artwork_comparator`)
@@ -85,7 +85,7 @@ integralność statusów dostawy (bramki), sekrety integracji, dostępność apl
 |---|---|---|---|
 | T: prompt injection z treści PDF | `core.prompt_safety` w obu modułach: sanityzacja, blok `<dane_niezaufane>`, reguła systemowa; AI może tylko podnieść ryzyko; sugestie czekają na managera (PR #11) | szczątkowe: model może zignorować regułę ⚪ | US-026 |
 | I: wyciek danych poufnych do dostawcy modelu | tryb bez kluczy; brak PII w promptach (zamierzenie) | brak formalnej umowy/minimalizacji w docs 🟡 | RODO.md, Z-07 |
-| D/koszt: nieograniczone wywołania | budżet miesięczny, `record_usage` | bramka budżetu tylko w 2 modułach; `table_extractor`/`scan_extractor` nie rejestrują 🟡 | US-006 |
+| D/koszt: nieograniczone wywołania | budżet miesięczny, `record_usage` | koszt rejestrowany przez wszystkie wywołania (US-006) ✅; budżet blokuje tylko opcjonalne AI — odczyt dokumentów nie jest blokowany (Z-16) ⚪ | decyzja PO |
 | T: wynik modelu w SQL/ścieżkach | wynik parsowany jako JSON, brak użycia w SQL/FS | — ✅ | — |
 | I: prefiks klucza w `/api/ai/status` | odpowiedź tylko `api_key_set` + model (PR #11) | — ✅ po merge | US-027 |
 

@@ -27,6 +27,11 @@ Wersja aplikacji: `constants.APP_VERSION`.
 - CI: deploy demo do Coolify — przy odpowiedzi 405 na GET ponawia wywołanie metodą POST i loguje kod HTTP (deploy po merge #11 nie ruszył).
 
 ### Security
+- **US-006 / R-06:** limit 30 wywołań / 60 s na użytkownika dla 19 kosztownych tras (Claude Vision, OCR skanów,
+  render PDF i 3D, batch i porównania artworków, PalViz, podgląd tabeli dostawcy); odpowiedź 429 z `Retry-After`.
+  Limiter przeniesiony do `core/rate_limit.py` (dekorator `heavy_rate_limit`, dostępny też dla blueprintów).
+  Koszt zapisuje teraz każde wywołanie Claude (`table_extractor`, `scan_extractor`, komentarz raportu artworku,
+  wykrywanie pól profilu), z użytkownikiem z sesji; komentarz AI w raporcie pomijany po przekroczeniu budżetu.
 - **US-028 / R-10:** wylogowanie tylko metodą POST z tokenem CSRF (formularz zamiast linku w `base.html`,
   `home.html`, `spedycja.html`, `agencja.html`). `GET /logout` niczego nie zmienia: zalogowanemu pokazuje
   stronę z przyciskiem, niezalogowanego odsyła na login. Obca strona nie wyloguje już użytkownika.

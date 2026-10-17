@@ -334,10 +334,6 @@ _validate_startup_config()
 
 # Login + forgot-password rate-limiter state moved to blueprints/auth.py (Phase 3, REFACTOR-01).
 
-# Per-user rate limiting for expensive AI/comparison endpoints
-# { user_id: [timestamp, ...] }
-_api_attempts: dict = {}
-_api_attempts_lock = threading.Lock()
 
 # Async job store — backed by the DB so job state is shared across gunicorn
 # workers (a client polling worker B sees a job created by worker A) and
@@ -459,55 +455,10 @@ def _kpi_cache_invalidate():
     with _kpi_cache_lock:
         _kpi_cache.clear()
 
-_api_rate_table_ready = False
-
-def _ensure_api_rate_table(db) -> None:
-    global _api_rate_table_ready
-    if _api_rate_table_ready:
-        return
-    db.execute("""CREATE TABLE IF NOT EXISTS api_rate_events (
-        user_id INTEGER NOT NULL,
-        created_at DOUBLE PRECISION NOT NULL
-    )""")
-    db.execute("CREATE INDEX IF NOT EXISTS idx_api_rate_user_ts ON api_rate_events(user_id, created_at)")
-    db.commit()
-    _api_rate_table_ready = True
-
-def _check_and_record_api_rate(user_id: int) -> bool:
-    """Check the per-user API rate limit and record the call. Returns True if limited.
-
-    DB-backed (table api_rate_events) so the limit is shared across gunicorn
-    workers instead of being counted per-process (which let the effective limit
-    scale with WEB_CONCURRENCY). Falls back to the in-memory dict on DB errors."""
-    now = time.time()
-    cutoff = now - API_RATE_WINDOW
-    try:
-        db = get_db()
-        try:
-            _ensure_api_rate_table(db)
-            db.execute("DELETE FROM api_rate_events WHERE user_id=? AND created_at < ?",
-                       (user_id, cutoff))
-            count = db.execute(
-                "SELECT COUNT(*) FROM api_rate_events WHERE user_id=? AND created_at >= ?",
-                (user_id, cutoff)).fetchone()[0]
-            if count >= API_RATE_MAX:
-                db.commit()
-                return True
-            db.execute("INSERT INTO api_rate_events(user_id, created_at) VALUES(?,?)",
-                       (user_id, now))
-            db.commit()
-            return False
-        finally:
-            db.close()
-    except Exception:
-        with _api_attempts_lock:
-            ts = [t for t in _api_attempts.get(user_id, []) if now - t < API_RATE_WINDOW]
-            if len(ts) >= API_RATE_MAX:
-                _api_attempts[user_id] = ts
-                return True
-            ts.append(now)
-            _api_attempts[user_id] = ts[-(API_RATE_MAX + 5):]
-            return False
+# Per-user limit for expensive endpoints → core/rate_limit.py (US-006).
+# The name _check_and_record_api_rate is kept: existing routes and tests use it.
+from core.rate_limit import check_and_record as _check_and_record_api_rate  # noqa: E402
+from core.rate_limit import heavy_rate_limit  # noqa: E402
 
 # ── Upload cleanup thread ──────────────────────────────────────────────────────
 def _cleanup_uploads():
@@ -4847,6 +4798,7 @@ def _try_auto_compare_pair(po_number: str, type_a: str, type_b: str,
 @app.route("/api/dostawy/extract-po", methods=["POST"])
 @login_required
 @csrf_protect
+@heavy_rate_limit
 def api_extract_po_preview():
     """Parse a PO PDF and return extracted fields for form pre-fill (no DB write)."""
     f = request.files.get("file")
@@ -5238,6 +5190,7 @@ def api_shipment_docs_download(ref, filename):
 @app.route("/api/shipments/validate-file", methods=["POST"])
 @login_required
 @csrf_protect
+@heavy_rate_limit
 def api_validate_shipment_file():
     """Validate that an uploaded PDF matches a given PO number (filename + content)."""
     po = (request.form.get("po_number") or "").strip()
@@ -6319,6 +6272,7 @@ def scan_page():
 @app.route("/api/scan/extract", methods=["POST"])
 @login_required
 @csrf_protect
+@heavy_rate_limit
 def api_scan_extract():
     """Przyjmuje jeden plik, ekstraktuje dane dostawy przez Claude Vision."""
     f = request.files.get("file")
@@ -6634,6 +6588,7 @@ def artwork_admin_page():
 @app.route("/api/artwork/preview-crops", methods=["POST"])
 @login_required
 @csrf_protect
+@heavy_rate_limit
 def api_artwork_preview_crops():
     """Extract field crops for preview/validation before running the actual comparison.
 
@@ -6820,6 +6775,7 @@ def api_artwork_preview_crops():
 @app.route("/api/artwork/split-compare", methods=["POST"])
 @login_required
 @csrf_protect
+@heavy_rate_limit
 def api_artwork_split_compare():
     """
     Wielostronicowy PDF dostawcy → porównuje z masterami wg jawnych par.
@@ -7267,6 +7223,7 @@ def artwork_3d_page():
 @app.route("/api/artwork/3d", methods=["POST"])
 @login_required
 @csrf_protect
+@heavy_rate_limit
 def api_artwork_3d():
     """Generuje model GLB opakowania z wgranego artworku PDF (dieline).
 
@@ -7453,6 +7410,7 @@ def api_artwork_page_images(cache_id, page_idx):
 @app.route("/api/artwork/pdf-pages", methods=["POST"])
 @login_required
 @csrf_protect
+@heavy_rate_limit
 def api_artwork_pdf_pages():
     """Zwraca liczbę stron i miniatury dla wgranego PDF.
     Jeśli page_idx podany → zwraca tylko jedną stronę (hires dla crop modal).
@@ -7545,6 +7503,7 @@ def api_artwork_history():
 @app.route("/api/artwork/compare-multi", methods=["POST"])
 @login_required
 @csrf_protect
+@heavy_rate_limit
 def api_artwork_compare_multi():
     """Porownuje N artworkow — buduje macierz rozbieznosci pol."""
     files = request.files.getlist("files[]")
@@ -7967,6 +7926,7 @@ def _artwork_batch_worker(job_id, pairs, upload_dir, uid, use_ai, ai_model="clau
 @app.route("/api/artwork/batch/start", methods=["POST"])
 @login_required
 @csrf_protect
+@heavy_rate_limit
 def api_artwork_batch_start():
     """Tworzy asynchroniczne zadanie batch i uruchamia je w tle."""
     import threading
@@ -8074,6 +8034,7 @@ def api_artwork_batch_cancel(job_id):
 @app.route("/api/artwork/batch/run", methods=["POST"])
 @login_required
 @csrf_protect
+@heavy_rate_limit
 def api_artwork_batch_run():
     """Uruchamia batch porównanie artworków. Streamuje NDJSON."""
     import json as _json
@@ -8239,6 +8200,7 @@ def api_artwork_zone_compare():
 @app.route("/api/artwork/field-queue/init", methods=["POST"])
 @login_required
 @csrf_protect
+@heavy_rate_limit
 def api_artwork_field_queue_init():
     """
     Initialise a field comparison queue for one artwork pair.
@@ -10955,6 +10917,8 @@ def _ai_detect_fields_from_b64(img_b64: str, mime: str = "image/jpeg") -> list:
             )}
         ]}]
     )
+    from api_usage_tracker import record_usage as _rec_usage
+    _rec_usage("claude-sonnet-4-6", getattr(response, "usage", None), call_type="artwork_ai_detect")
     raw = (response.content[0].text if response.content and hasattr(response.content[0], "text") else "").strip()
     if "```" in raw:
         raw = raw.split("```")[1]
@@ -11593,6 +11557,7 @@ def api_artwork_profile_history_snapshot(pid, hid):
 @app.route("/api/artwork/profiles/ai-detect", methods=["POST"])
 @require_role("manager")
 @csrf_protect
+@heavy_rate_limit
 def api_artwork_profile_ai_detect():
     """Wysyła artworka do Claude Vision i zwraca AI-sugerowane pola z bboxami."""
     import base64 as _b64, io as _io, json as _json
@@ -11667,6 +11632,8 @@ def api_artwork_profile_ai_detect():
                 ]
             }]
         )
+        from api_usage_tracker import record_usage as _rec_usage
+        _rec_usage("claude-sonnet-4-6", getattr(response, "usage", None), call_type="artwork_ai_detect")
 
         raw = (response.content[0].text if response.content and hasattr(response.content[0], "text") else "").strip()
         # Strip markdown code fences if present
@@ -11717,6 +11684,7 @@ def api_artwork_profile_ai_detect():
 @app.route("/api/artwork/profiles/ai-detect-image", methods=["POST"])
 @require_role("manager")
 @csrf_protect
+@heavy_rate_limit
 def api_artwork_profile_ai_detect_image():
     """Przyjmuje obraz JPEG (z canvas) i zwraca AI-sugerowane pola."""
     import base64 as _b64, json as _json
@@ -11767,6 +11735,8 @@ def api_artwork_profile_ai_detect_image():
                 ]
             }]
         )
+        from api_usage_tracker import record_usage as _rec_usage
+        _rec_usage("claude-sonnet-4-6", getattr(response, "usage", None), call_type="artwork_ai_detect")
 
         raw = (response.content[0].text if response.content and hasattr(response.content[0], "text") else "").strip()
         if "```" in raw:
@@ -11869,6 +11839,7 @@ def api_artwork_profile_duplicate(pid):
 @app.route("/api/artwork/profiles/<int:pid>/render", methods=["POST"])
 @require_role("manager")
 @csrf_protect
+@heavy_rate_limit
 def api_artwork_profile_render(pid):
     """Renderuje artworka z nałożonymi polami szablonu — podgląd dla edytora."""
     import base64 as _b64, io as _io
@@ -11930,6 +11901,7 @@ def api_artwork_profile_render(pid):
 @app.route("/api/artwork/profiles/render-blank", methods=["POST"])
 @login_required
 @csrf_protect
+@heavy_rate_limit
 def api_artwork_profile_render_blank():
     """Renderuje artworka bez nałożonych pól — do definiowania nowych regionów."""
     import base64 as _b64, io as _io

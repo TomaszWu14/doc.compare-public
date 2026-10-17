@@ -18,6 +18,7 @@ from werkzeug.utils import secure_filename
 
 from db import get_db
 from core.security import login_required, require_role, csrf_protect, can_see_all
+from core.rate_limit import heavy_rate_limit
 from core.audit import log_audit
 
 logger = logging.getLogger("doccompare")
@@ -81,6 +82,7 @@ def palviz_page():
 @bp.route("/api/artwork/palviz", methods=["POST"])
 @login_required
 @csrf_protect
+@heavy_rate_limit
 def api_palviz_generate():
     """Dieline PDF → podgląd GLB + eksport PalViz (6 PNG/ścianka + manifest) w ZIP."""
     import shutil
@@ -170,6 +172,7 @@ def palviz_batch_page():
 @bp.route("/api/artwork/palviz/batch", methods=["POST"])
 @login_required
 @csrf_protect
+@heavy_rate_limit
 def api_palviz_batch():
     import shutil
     import tempfile
@@ -244,6 +247,7 @@ def templates_page():
 @bp.route("/api/artwork/templates/analyze", methods=["POST"])
 @require_role("manager")   # US-001: dekorator — wcześniej `if not require_role(...)` nigdy nie sprawdzał roli
 @csrf_protect
+@heavy_rate_limit
 def api_templates_analyze():
     file = request.files.get("file")
     if not file or not file.filename.lower().endswith(".pdf"):
