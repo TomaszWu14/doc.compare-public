@@ -108,7 +108,9 @@ def test_login_non_ascii_csrf_rejected_cleanly(client):
 # ── Wylogowanie ───────────────────────────────────────────────────────────────
 def test_logout_clears_session(admin_client):
     assert admin_client.get("/home").status_code == 200
-    resp = admin_client.get("/logout")
+    with admin_client.session_transaction() as sess:
+        sess["_csrf_token"] = CSRF_TOKEN
+    resp = admin_client.post("/logout", data={"_csrf_token": CSRF_TOKEN})
     assert resp.status_code == 302
     # Po wylogowaniu chroniona strona znów przekierowuje na login.
     assert admin_client.get("/home").status_code == 302

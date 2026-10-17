@@ -54,7 +54,7 @@ ROUTES = [
     # Auth
     ("Autoryzacja", "GET",  "/login",                      "login_page",             "Nie",     "Nie",  "Formularz logowania", "db"),
     ("Autoryzacja", "POST", "/login",                       "do_login",               "Nie",     "Tak",  "Weryfikuje dane logowania, ustawia sesję", "db"),
-    ("Autoryzacja", "GET",  "/logout",                      "logout",                 "Tak",     "Nie",  "Czyści sesję użytkownika", ""),
+    ("Autoryzacja", "POST", "/logout",                      "logout",                 "Tak",     "Tak",  "Czyści sesję użytkownika (GET: strona potwierdzenia)", ""),
     ("Autoryzacja", "GET",  "/forgot-password",             "forgot_password_page",   "Nie",     "Nie",  "Formularz przypomnienia hasła", ""),
     ("Autoryzacja", "POST", "/forgot-password",             "do_forgot_password",     "Nie",     "Tak",  "Wysyła e-mail resetujący hasło przez Resend API", "db"),
     ("Autoryzacja", "GET",  "/reset-password/<token>",      "reset_password_page",    "Nie",     "Nie",  "Formularz resetowania hasła (token z e-maila)", "db"),

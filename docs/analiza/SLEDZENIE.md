@@ -21,7 +21,7 @@
 | SEC-008 | US-025 | `tests/test_integration.py` (nagłówki) — do rozszerzenia o CSP bez `unsafe-inline` | — | do realizacji |
 | SEC-012 | US-026 | `tests/test_prompt_safety.py` — 11 testów: sanityzacja, blok danych niezaufanych, reguła systemowa, prompty `learn_from_document` i `learn_from_comparison`, wspólna funkcja w obu modułach | #11 | w przeglądzie (odbiór BA ✅, SEC ✅) |
 | SEC-010 | US-027 | `tests/test_info_leaks.py` — 8 testów: 500 PalViz bez tracebacku (analyze, generate), brak fragmentu klucza (status, check), CSV bez formuł, helper `formula_safe`, podgląd szablonu własny/cudzy | #11 | w przeglądzie (odbiór BA ✅, SEC ✅) |
-| SEC-010 | US-028 | planowany test: GET `/logout` nie wylogowuje, POST bez CSRF → 403 | — | do realizacji |
+| SEC-010 | US-028 | `tests/test_logout_post.py` (7 testów, w tym strażnik: żaden szablon nie linkuje do `/logout`) | PR #22 | zrealizowane (czeka na merge) |
 | NFR-024 | US-018 | `tests/test_backup_scripts.py`? nie — nowy test porównujący schematy SQLite/PG | — | do realizacji |
 | NFR-013 | US-019 | zacieśnienie zapadki w `ci.yml` | — | do realizacji |
 | NFR-025 | US-020 | planowany test startu bez wątków (`APP_BACKGROUND_THREADS=0`) | — | do realizacji |

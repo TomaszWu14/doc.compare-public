@@ -120,7 +120,7 @@ a{color:inherit;text-decoration:none}
   <nav class="header-right" aria-label="Konto użytkownika">
     <span class="user-info">{{ username }}</span>
     <span class="role-badge role-{{ role }}">{{ role }}</span>
-    <a href="/logout" class="btn-logout">Wyloguj</a>
+    <form method="post" action="/logout" style="display:inline;margin:0"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn-logout">Wyloguj</button></form>
   </nav>
 </header>
 

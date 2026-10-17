@@ -24,7 +24,7 @@ from pydantic import BaseModel, Field, ValidationError, model_validator
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from core.audit import log_audit as _log_audit
-from core.security import csrf_protect, login_required
+from core.security import csrf_protect, login_required, verify_csrf
 from core.timeutil import ts_ago as _ts_ago
 from db import get_db
 from email_helpers import send_reset_email
@@ -239,8 +239,23 @@ def set_language(lang):
     return redirect(_ref if _safe else "/home")
 
 
-@bp.route("/logout")
+@bp.route("/logout", methods=["GET", "POST"])
 def logout():
+    """Wylogowanie wyłącznie metodą POST z tokenem CSRF (US-028).
+
+    GET nie zmienia stanu: zalogowany użytkownik dostaje stronę z przyciskiem
+    (stare zakładki i linki dalej działają), niezalogowany wraca na login.
+    Dzięki temu obca strona (<img src="/logout">) nie wyloguje użytkownika.
+    """
+    if "user_id" not in session:
+        session.clear()
+        return redirect(url_for("auth.login"))
+    if request.method == "GET":
+        return render_template("logout_confirm.html")
+    if not verify_csrf():
+        logger.warning("CSRF validation failed: POST /logout from %s", request.remote_addr)
+        return render_template("logout_confirm.html",
+                               error="Błąd bezpieczeństwa — spróbuj ponownie."), 403
     uname = session.get("username", "?")
     _log_audit("logout", uname)
     session.clear()
