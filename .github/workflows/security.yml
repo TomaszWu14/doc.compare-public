@@ -37,7 +37,7 @@ jobs:
       - name: Pełny raport JSON (artefakt, wszystkie wagi)
         if: always()
         run: bandit -r . -x ./.venv,./venv,./node_modules,./.git,./tests,./static -f json -o bandit.json || true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: bandit-json
@@ -62,7 +62,7 @@ jobs:
       - name: Raport JSON (artefakt)
         if: always()
         run: pip-audit -r requirements-prod.txt --progress-spinner off -f json -o pip-audit.json || true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: pip-audit-json
@@ -99,7 +99,7 @@ jobs:
         run: |
           trivy fs --scanners vuln,secret,misconfig --severity HIGH,CRITICAL \
             --ignore-unfixed --ignorefile .trivyignore --exit-code 0 --format sarif -o trivy-fs.sarif .
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: trivy-fs-sarif
@@ -147,7 +147,7 @@ jobs:
         run: |
           trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 --format table doccompare:ci
           trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 --format sarif -o trivy-image.sarif doccompare:ci
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: trivy-image-sarif
