@@ -32,6 +32,9 @@ Wersja aplikacji: `constants.APP_VERSION`.
 - CI: deploy demo do Coolify — przy odpowiedzi 405 na GET ponawia wywołanie metodą POST i loguje kod HTTP (deploy po merge #11 nie ruszył).
 
 ### Security
+- **US-025 etap 1 / R-05:** skrypty z CDN mają przypiętą wersję i SRI (`integrity` + `crossorigin`):
+  lucide (dotąd `@latest` w `base.html` — każda nowa wersja pakietu trafiała na wszystkie strony), Alpine,
+  React, Babel, Chart.js. Test-strażnik `tests/test_sri.py`. Wyjątek: Tailwind Play CDN (generowany dynamicznie).
 - **US-029 / R-15:** usunięty silnik OCR `surya-ocr` (warstwa 6 z 8 lokalnej kaskady, domyślnie wyłączonej),
   który blokował bezpieczne wersje bibliotek. Obraz produkcyjny dostaje `pillow>=12.3` i `transformers>=5.12.1`;
   pip-audit dla `requirements.txt` (zestaw z Dockerfile) jest teraz blokujący, bez wyjątków.

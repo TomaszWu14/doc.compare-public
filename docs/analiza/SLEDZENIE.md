@@ -18,7 +18,7 @@
 | FR-040 | US-009 | `tests/test_api_dostawa_advance_customs_gate.py` (częściowo) + nowe | — | decyzja PO |
 | FR-042 | US-010 | `tests/test_forwarding_order.py` (dziś sprawdza 409) | — | decyzja PO |
 | FR-006, FR-012 | US-011 | `tests/test_business_logic.py` + nowy test waluty na pozycji | — | częściowo decyzja PO |
-| SEC-008 | US-025 | `tests/test_integration.py` (nagłówki) — do rozszerzenia o CSP bez `unsafe-inline` | — | do realizacji |
+| SEC-008 | US-025 | `tests/test_sri.py` (SRI + przypięte wersje CDN, etap 1); `tests/test_integration.py` (nagłówki) — do rozszerzenia o CSP bez `unsafe-inline` (etap 2) | PR (US-025 etap 1) | w toku |
 | SEC-012 | US-026 | `tests/test_prompt_safety.py` — 11 testów: sanityzacja, blok danych niezaufanych, reguła systemowa, prompty `learn_from_document` i `learn_from_comparison`, wspólna funkcja w obu modułach | #11 | w przeglądzie (odbiór BA ✅, SEC ✅) |
 | SEC-010 | US-027 | `tests/test_info_leaks.py` — 8 testów: 500 PalViz bez tracebacku (analyze, generate), brak fragmentu klucza (status, check), CSV bez formuł, helper `formula_safe`, podgląd szablonu własny/cudzy | #11 | w przeglądzie (odbiór BA ✅, SEC ✅) |
 | SEC-010 | US-028 | `tests/test_logout_post.py` (7 testów, w tym strażnik: żaden szablon nie linkuje do `/logout`) | PR #22 | zrealizowane (czeka na merge) |
