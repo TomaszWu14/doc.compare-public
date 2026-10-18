@@ -60,8 +60,8 @@ jobs:
       # build obrazu w Coolify pada. Ten krok blokuje (sama rozdzielczość, bez instalacji).
       - name: requirements.txt da się zainstalować (blokuje)
         run: pip install --dry-run --ignore-installed --quiet -r requirements.txt
-      - name: Pełny zestaw ML (doradczo — ciężkie pakiety, część bez kół dla runnera)
-        continue-on-error: true
+      # requirements.txt to zestaw obrazu produkcyjnego (Dockerfile) — znane podatności blokują (US-029).
+      - name: Zestaw obrazu produkcyjnego — requirements.txt (blokuje)
         run: pip-audit -r requirements.txt --progress-spinner off
       - name: Raport JSON (artefakt)
         if: always()

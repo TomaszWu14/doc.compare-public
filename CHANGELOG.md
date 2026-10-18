@@ -32,6 +32,9 @@ Wersja aplikacji: `constants.APP_VERSION`.
 - CI: deploy demo do Coolify — przy odpowiedzi 405 na GET ponawia wywołanie metodą POST i loguje kod HTTP (deploy po merge #11 nie ruszył).
 
 ### Security
+- **US-029 / R-15:** usunięty silnik OCR `surya-ocr` (warstwa 6 z 8 lokalnej kaskady, domyślnie wyłączonej),
+  który blokował bezpieczne wersje bibliotek. Obraz produkcyjny dostaje `pillow>=12.3` i `transformers>=5.12.1`;
+  pip-audit dla `requirements.txt` (zestaw z Dockerfile) jest teraz blokujący, bez wyjątków.
 - **R-15:** obraz produkcyjny (Dockerfile → `requirements.txt`) miał pypdf 4.3.1 z 85 znanymi podatnościami
   i pillow 10.4.0; pypdf podniesione do ≥6.20.1. Pillow (≥12.3) musiało wrócić do <11 — blokuje je
   `surya-ocr` (zob. „Fixed”); pillow i transformers 4.57.6 → US-029.

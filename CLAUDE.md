@@ -165,7 +165,7 @@ Claude Vision → Mistral OCR → img2table → Tesseract (PSM 6). See
 
 **OCR engines** are integrated as fallbacks (most gated behind flags to avoid RAM/time blowups):
 Mistral OCR (primary API), Claude Vision, Tesseract (always-available last resort), and optional
-local neural engines RapidOCR → PaddleOCR → EasyOCR → DocTR → Surya → Qwen2.5-VL / GOT-OCR. Local
+local neural engines RapidOCR → PaddleOCR → EasyOCR → DocTR → Qwen2.5-VL / GOT-OCR (Surya removed in US-029). Local
 neural OCR for artwork is off by default (`ARTWORK_OCR_LOCAL`); Qwen is gated by `DISABLE_QWEN`.
 
 ### Artwork Comparison Pipeline

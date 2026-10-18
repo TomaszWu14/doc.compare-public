@@ -3,7 +3,7 @@
 #
 # Zawiera CAŁĄ wolno instalującą się warstwę: pakiety systemowe (tesseract,
 # poppler, ghostscript…), CPU-PyTorch oraz wszystkie zależności z
-# requirements.txt (paddle, easyocr, doctr, surya, lightglue, groundingdino…).
+# requirements.txt (paddle, easyocr, doctr, lightglue, groundingdino…).
 #
 # Buduje się ~7-8 min, ale RZADKO — tylko gdy zmienia się requirements.txt lub
 # ten plik. Publikowany do GHCR przez workflow `.github/workflows/ml-base-image.yml`.
