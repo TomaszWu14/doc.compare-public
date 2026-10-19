@@ -57,6 +57,21 @@ i bramki CI: [`CONTRIBUTING.md`](CONTRIBUTING.md). Zgłaszanie podatności: [`SE
 gitleaks, trivy, Dependabot) wdrożone; backlog startowy z poprawkami bezpieczeństwa na czele czeka na decyzje PO
 (`docs/analiza/ZALOZENIA.md`).
 
+## Bezpieczeństwo
+
+Zgłaszanie podatności: [`SECURITY.md`](SECURITY.md) (prywatnie, przez GitHub „Report a vulnerability”).
+CI (`.github/workflows/security.yml`) na każdym PR i pushu do `main` pilnuje:
+
+- **sekretów** — gitleaks (przypięta wersja + sha256; wyjątki w `.gitleaksignore` z uzasadnieniem),
+- **SAST** — Bandit (ustalenia ≥ MEDIUM blokują) i Semgrep `p/owasp-top-ten` (na PR blokuje każde nowe ustalenie),
+- **zależności** — pip-audit (`requirements-prod.txt`, `requirements.txt`, `dev-requirements.txt`) i Trivy `fs`
+  (HIGH/CRITICAL z dostępną poprawką blokują; wyjątki w `.trivyignore`), Dependabot (pip, akcje GitHub, Docker),
+- **higieny workflow** — `permissions: contents: read`, akcje przypięte do SHA.
+
+Aplikacja ustawia nagłówki bezpieczeństwa na każdej odpowiedzi (CSP, `nosniff`, `X-Frame-Options`, `Referrer-Policy`,
+`Permissions-Policy`, `Cross-Origin-Opener-Policy`, HSTS za HTTPS, `Cache-Control: no-store` dla JSON) —
+test: `tests/test_security_headers.py`.
+
 ## Jak uruchomić
 
 Pełne `requirements.txt` instaluje stos ML/OCR (PyTorch, DocTR…) — kilka GB. Do testów i głównej

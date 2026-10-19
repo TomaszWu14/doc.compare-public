@@ -1,4 +1,4 @@
-# Dependabot: cotygodniowe aktualizacje zależności Pythona i akcji GitHub.
+# Dependabot: cotygodniowe aktualizacje zależności Pythona, akcji GitHub i obrazów Dockera.
 # Zakresy wersji w requirements*.txt są szerokie, więc Dependabot głównie
 # podbija dolne granice i zgłasza podatności (security updates); pełne
 # przypięcie wersji (lock z hashami) jest w backlogu (US-022).
@@ -21,3 +21,21 @@ updates:
       day: "monday"
     open-pull-requests-limit: 5
     labels: ["dependencies", "ci"]
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+  # Obrazy bazowe w Dockerfile* (katalog główny) i artwork-engine/Dockerfile.
+  - package-ecosystem: "docker"
+    directories: ["/", "/artwork-engine"]
+    # Zmiana wersji Pythona w obrazie (np. 3.11 → 3.12) to decyzja PO, nie automat.
+    ignore:
+      - dependency-name: "python"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "SEC"]
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]

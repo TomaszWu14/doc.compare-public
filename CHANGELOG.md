@@ -6,6 +6,10 @@ Wersja aplikacji: `constants.APP_VERSION`.
 ## [Unreleased]
 
 ### Added
+- Wspólna podstawa bezpieczeństwa: job Semgrep `p/owasp-top-ten` w `security.yml` (na PR bramka na nowe
+  ustalenia, pełny raport doradczo), pip-audit także dla `dev-requirements.txt`, Dependabot dla obrazów Docker,
+  nagłówki `Cross-Origin-Opener-Policy: same-origin` i `Cache-Control: no-store` dla odpowiedzi JSON
+  (`tests/test_security_headers.py`), sekcja „Bezpieczeństwo” w README.
 - Logo DocCompare (`static/img/`: znak, wersje jasna/ciemna, favicon SVG/PNG, ikona Apple) w menu bocznym,
   na stronach logowania, resetu hasła i wylogowania, na ekranie wyboru modułu, w portalach spedycji i agencji
   oraz na stronie potwierdzenia przyjazdu kierowcy; wspólny `templates/_favicon.html`.
@@ -22,6 +26,9 @@ Wersja aplikacji: `constants.APP_VERSION`.
 - Pre-commit: gitleaks, kontrola końców linii, dużych plików, YAML i kluczy prywatnych.
 
 ### Changed
+- CI: akcje GitHub przypięte do SHA (z komentarzem wersji); gitleaks i Trivy instalowane jako binarki
+  o przypiętej wersji i sumie sha256 (zamiast `gitleaks-action` i skryptu `install.sh` z gałęzi `main`);
+  Bandit i pip-audit w przypiętych wersjach.
 - `tests/conftest.py`: konto testowe `it_user` i fixture `user_client` (testy „brak dostępu” dla najniższej roli).
 - `security.yml` uruchamia się także na PR i pushu do `main` (dotąd tylko co miesiąc); Python 3.11 jak w produkcji.
 
