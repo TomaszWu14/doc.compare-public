@@ -30,7 +30,7 @@ pillow>=12.3
 # ── Image processing ─────────────────────────────────────────────────────────
 opencv-python-headless>=4.8
 scikit-image>=0.22
-imagehash>=4.3
+imagehash>=4.3.2
 
 # ── Export ────────────────────────────────────────────────────────────────────
 reportlab>=4.0
