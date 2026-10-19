@@ -39,7 +39,7 @@ transformers>=5.12.1,<6.0     # HuggingFace — DINOv2 similarity + Table Transf
 torch>=2.1                     # PyTorch CPU — wymagany przez LightGlue, DINOv2, Table Transformer, DocTR
 
 # ── YOLOv8 (detekcja elementów pakowania) ───────────────
-ultralytics>=8.0               # YOLOv8 — trening własnego modelu na etykietach medycznych
+ultralytics>=8.4.178               # YOLOv8 — trening własnego modelu na etykietach medycznych
 
 # ── Matching / NLP ──────────────────────────────────────
 rapidfuzz>=3.0,<4.0
