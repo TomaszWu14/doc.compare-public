@@ -7,6 +7,7 @@
 <meta name="description" content="Zaloguj się do platformy DocCompare — weryfikacja dokumentów handlowych ACME">
 <meta name="theme-color" content="#0f1119">
 <title>Logowanie — DocCompare</title>
+{% include "_favicon.html" %}
 <style>
 :root{
   --bg:#0f1119;--surface:#181b27;--border:#252840;
@@ -66,7 +67,7 @@ input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(91,155,255,.12)
 <div class="bg-glow"></div>
 <div class="card">
   <div class="brand">
-    <div class="brand-icon">🏥</div>
+    <img src="{{ url_for('static', filename='img/logo-mark.svg') }}" alt="" width="38" height="38" style="display:block;flex:0 0 auto">
     <div class="brand-text">
       <div class="brand-name">DocCompare</div>
       <div class="brand-sub">ACME</div>

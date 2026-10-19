@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0f1119">
 <title>DocCompare — wybierz moduł</title>
+{% include "_favicon.html" %}
 <style>
 :root{
   --bg:#0f1119;--surface:#181b27;--surface2:#1e2235;--border:#252840;
@@ -115,7 +116,7 @@ a{color:inherit;text-decoration:none}
 
 <header class="header">
   <div class="brand">
-    <div class="brand-icon" aria-hidden="true">🏥</div>
+    <img src="{{ url_for('static', filename='img/logo-mark.svg') }}" alt="" width="34" height="34" style="display:block;flex:0 0 auto">
     <span class="brand-name">DocCompare</span>
   </div>
   <nav class="header-right" aria-label="Konto użytkownika">

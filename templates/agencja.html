@@ -8,6 +8,7 @@
   <meta name="description" content="Portal zewnętrzny dla agencji celnych — odprawy ACME">
   <meta name="robots" content="noindex,nofollow">
   <title>Portal Agencji Celnej — DocCompare</title>
+{% include "_favicon.html" %}
   <style>
     :root{
       --bg:#0f172a; --surface:#1e293b; --surface2:#273449; --border:#334155;
@@ -51,7 +52,7 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand"><span class="ic" aria-hidden="true">🛃</span> Portal Agencji Celnej</div>
+    <div class="brand"><img src="{{ url_for('static', filename='img/logo-mark.svg') }}" alt="DocCompare" width="28" height="28" style="display:block"> Portal Agencji Celnej</div>
     <nav style="display:flex;align-items:center;gap:14px" aria-label="Konto użytkownika">
       <span class="who">{{ agency_name or '—' }} · <b>{{ username }}</b></span>
       <form method="post" action="/logout" style="display:inline;margin:0"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn" style="font:inherit">Wyloguj</button></form>

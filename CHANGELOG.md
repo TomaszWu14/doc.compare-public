@@ -6,6 +6,9 @@ Wersja aplikacji: `constants.APP_VERSION`.
 ## [Unreleased]
 
 ### Added
+- Logo DocCompare (`static/img/`: znak, wersje jasna/ciemna, favicon SVG/PNG, ikona Apple) w menu bocznym,
+  na stronach logowania, resetu hasła i wylogowania, na ekranie wyboru modułu, w portalach spedycji i agencji
+  oraz na stronie potwierdzenia przyjazdu kierowcy; wspólny `templates/_favicon.html`.
 - `docs/AUDYT.md` — audyt otwierający w trzech rolach (BA/DEV/SEC) ze stanu `ef950bb` (PR #11).
 - Szkielet procesu zespołowego: `CONTRIBUTING.md` (role, proces, DoR/DoD, konwencje, bramki), `SECURITY.md`,
   szablony issue (`user_story`, `bug`, `security_issue`), szablon PR z checklistami BA/DEV/SEC, `CODEOWNERS`,
