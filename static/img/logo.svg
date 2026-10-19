@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 320" width="1240" height="320">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5b9bff"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+    <linearGradient id="ink" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b82f6"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+    <linearGradient id="word" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5b9bff"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+  </defs>
+  <g transform="translate(24 24) scale(0.53125)">
+    <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+    <g transform="rotate(-8 230 250)"><path d="M130 108h150l58 58v214a20 20 0 0 1-20 20H130a20 20 0 0 1-20-20V128a20 20 0 0 1 20-20z" fill="#fff" opacity="0.38"/></g>
+    <path d="M204 128h138l70 70v206a22 22 0 0 1-22 22H204a22 22 0 0 1-22-22V150a22 22 0 0 1 22-22z" fill="#fff"/>
+    <path d="M342 128v48a22 22 0 0 0 22 22h48z" fill="#dbe4ff"/>
+    <rect x="216" y="216" width="104" height="14" rx="7" fill="#c7d2fe"/>
+    <rect x="216" y="248" width="152" height="14" rx="7" fill="#c7d2fe"/>
+    <path d="M236 334l38 38 82-86" fill="none" stroke="url(#ink)" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="336" y="196" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="128" font-weight="700" letter-spacing="-3">
+    <tspan fill="#0f172a">Doc</tspan><tspan fill="url(#word)">Compare</tspan>
+  </text>
+  <text x="342" y="254" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="34" font-weight="500" fill="#64748b" letter-spacing="6">PORÓWNANIE DOKUMENTÓW</text>
+</svg>

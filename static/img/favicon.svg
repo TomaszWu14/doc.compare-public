@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5b9bff"/>
+      <stop offset="1" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="ink" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- back document -->
+  <g transform="rotate(-8 230 250)">
+    <path d="M130 108h150l58 58v214a20 20 0 0 1-20 20H130a20 20 0 0 1-20-20V128a20 20 0 0 1 20-20z" fill="#ffffff" opacity="0.38"/>
+  </g>
+  <!-- front document -->
+  <path d="M204 128h138l70 70v206a22 22 0 0 1-22 22H204a22 22 0 0 1-22-22V150a22 22 0 0 1 22-22z" fill="#ffffff"/>
+  <path d="M342 128v48a22 22 0 0 0 22 22h48z" fill="#dbe4ff"/>
+  <!-- text lines -->
+  <rect x="216" y="216" width="104" height="14" rx="7" fill="#c7d2fe"/>
+  <rect x="216" y="248" width="152" height="14" rx="7" fill="#c7d2fe"/>
+  <!-- check mark -->
+  <path d="M236 334l38 38 82-86" fill="none" stroke="url(#ink)" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

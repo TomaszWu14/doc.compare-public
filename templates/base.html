@@ -7,7 +7,7 @@
 <meta name="description" content="DocCompare — platforma weryfikacji dokumentów handlowych i artworków ACME">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#1d4ed8">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231d4ed8'/%3E%3Ctext y='23' x='5' font-size='20' fill='white'%3E⚖%3C/text%3E%3C/svg%3E">
+{% include "_favicon.html" %}
 <title>{% block title %}DocCompare{% endblock %} — ACME</title>
 <link rel="dns-prefetch" href="https://fonts.googleapis.com">
 <link rel="dns-prefetch" href="https://fonts.gstatic.com">
@@ -17,7 +17,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="https://unpkg.com/lucide@1.59.0/dist/umd/lucide.min.js" integrity="sha384-4VQAGBhahgTiMVvXUqbh6qcs45zGzR/8znv7XORRfWkxZfzRbhLL5Uh+fSdvdqdM" crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='js/shell.js') }}"></script>
 {% block extra_head %}{% endblock %}
 <script>
@@ -73,8 +73,8 @@ window.apiFetch = async function(url, opts){
   return data;
 };
 </script>
-<script defer src="https://unpkg.com/@alpinejs/collapse@3.13.0/dist/cdn.min.js"></script>
-<script defer src="https://unpkg.com/alpinejs@3.13.0/dist/cdn.min.js"></script>
+<script defer src="https://unpkg.com/@alpinejs/collapse@3.13.0/dist/cdn.min.js" integrity="sha384-2OH1oWuzGQTwIVsefc3w96FepRDcaddeEJiyo8ZXCQA4jP7C4mQMdI70jDKtgq0R" crossorigin="anonymous"></script>
+<script defer src="https://unpkg.com/alpinejs@3.13.0/dist/cdn.min.js" integrity="sha384-EjEsUfA/5AUp6AOIxGF9AopVVVwLwWKoPCOZPsblbSOTPiaTUOkSxL5rKNN5Vvd3" crossorigin="anonymous"></script>
 </head>
 <body class="flex min-h-screen" style="background:var(--bg)">
 {% include '_demo_readonly_banner.html' %}
@@ -91,11 +91,11 @@ window.apiFetch = async function(url, opts){
 
     {# Brand #}
     <a href="/home" class="h-[60px] flex items-center gap-2.5 px-3.5 border-b shrink-0" style="border-color:var(--nav-border);">
-      <div class="w-9 h-9 rounded-[10px] grid place-items-center shrink-0 font-bold text-white text-[15px]"
-           style="background:linear-gradient(135deg,#2563eb,#1d4ed8);box-shadow:0 2px 8px rgba(37,99,235,.35);">A</div>
+      <img src="{{ url_for('static', filename='img/logo-mark.svg') }}" alt="" width="36" height="36"
+           class="w-9 h-9 shrink-0" style="filter:drop-shadow(0 2px 6px rgba(91,155,255,.35));">
       <div class="rail-hide leading-tight overflow-hidden">
-        <div class="text-white font-bold text-[15px] tracking-tight">ACME</div>
-        <div class="text-[11px] font-medium" style="color:var(--nav-muted);">DocCompare&nbsp;v6</div>
+        <div class="text-white font-bold text-[15px] tracking-tight">DocCompare</div>
+        <div class="text-[11px] font-medium" style="color:var(--nav-muted);">ACME&nbsp;·&nbsp;v6</div>
       </div>
     </a>
 

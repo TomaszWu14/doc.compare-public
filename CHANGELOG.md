@@ -6,6 +6,9 @@ Wersja aplikacji: `constants.APP_VERSION`.
 ## [Unreleased]
 
 ### Added
+- Logo DocCompare (`static/img/`: znak, wersje jasna/ciemna, favicon SVG/PNG, ikona Apple) w menu bocznym,
+  na stronach logowania, resetu hasła i wylogowania, na ekranie wyboru modułu, w portalach spedycji i agencji
+  oraz na stronie potwierdzenia przyjazdu kierowcy; wspólny `templates/_favicon.html`.
 - `docs/AUDYT.md` — audyt otwierający w trzech rolach (BA/DEV/SEC) ze stanu `ef950bb` (PR #11).
 - Szkielet procesu zespołowego: `CONTRIBUTING.md` (role, proces, DoR/DoD, konwencje, bramki), `SECURITY.md`,
   szablony issue (`user_story`, `bug`, `security_issue`), szablon PR z checklistami BA/DEV/SEC, `CODEOWNERS`,
@@ -32,6 +35,9 @@ Wersja aplikacji: `constants.APP_VERSION`.
 - CI: deploy demo do Coolify — przy odpowiedzi 405 na GET ponawia wywołanie metodą POST i loguje kod HTTP (deploy po merge #11 nie ruszył).
 
 ### Security
+- **US-025 etap 1 / R-05:** skrypty z CDN mają przypiętą wersję i SRI (`integrity` + `crossorigin`):
+  lucide (dotąd `@latest` w `base.html` — każda nowa wersja pakietu trafiała na wszystkie strony), Alpine,
+  React, Babel, Chart.js. Test-strażnik `tests/test_sri.py`. Wyjątek: Tailwind Play CDN (generowany dynamicznie).
 - **US-029 / R-15:** usunięty silnik OCR `surya-ocr` (warstwa 6 z 8 lokalnej kaskady, domyślnie wyłączonej),
   który blokował bezpieczne wersje bibliotek. Obraz produkcyjny dostaje `pillow>=12.3` i `transformers>=5.12.1`;
   pip-audit dla `requirements.txt` (zestaw z Dockerfile) jest teraz blokujący, bez wyjątków.

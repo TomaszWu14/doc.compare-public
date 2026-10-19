@@ -9,6 +9,7 @@
   <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#1d4ed8">
   <title>Potwierdzenie przyjazdu — DocCompare</title>
+{% include "_favicon.html" %}
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -224,7 +225,7 @@
 
   <!-- Logo -->
   <div class="logo">
-    <div class="logo-icon">⚖️</div>
+    <img class="logo-icon" src="{{ url_for('static', filename='img/logo-mark.svg') }}" alt="" width="52" height="52" style="background:none">
     <div class="logo-name">DocCompare</div>
     <div class="logo-sub">ACME</div>
   </div>
