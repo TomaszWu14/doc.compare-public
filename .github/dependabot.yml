@@ -10,6 +10,9 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 5
+    # Świeżo opublikowane wersje bywają złośliwe/niestabilne — odczekaj 7 dni.
+    cooldown:
+      default-days: 7
     labels: ["dependencies", "SEC"]
     groups:
       minor-and-patch:
@@ -20,6 +23,9 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 5
+    # Świeżo opublikowane wersje bywają złośliwe/niestabilne — odczekaj 7 dni.
+    cooldown:
+      default-days: 7
     labels: ["dependencies", "ci"]
     groups:
       minor-and-patch:
@@ -35,6 +41,9 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 5
+    # Świeżo opublikowane wersje bywają złośliwe/niestabilne — odczekaj 7 dni.
+    cooldown:
+      default-days: 7
     labels: ["dependencies", "SEC"]
     groups:
       minor-and-patch:
