@@ -4,7 +4,8 @@
 
 **Nie zgłaszaj podatności w publicznych issues ani PR.** Użyj prywatnego zgłoszenia:
 
-1. GitHub → zakładka **Security** → **Report a vulnerability** (prywatne zgłoszenie do właściciela repozytorium).
+1. GitHub → zakładka **Security** → **Report a vulnerability** (prywatne zgłoszenie do właściciela repozytorium):
+   <https://github.com/TomaszWu14/doc.compare-public/security/advisories/new>.
 2. Jeśli ta opcja jest niedostępna: wiadomość do właściciela repozytorium (`@TomaszWu14`) z prośbą
    o kanał prywatny. Adres e-mail do zgłoszeń: `<DO POTWIERDZENIA przez PO>`.
 

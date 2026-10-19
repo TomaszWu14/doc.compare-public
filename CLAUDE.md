@@ -70,7 +70,7 @@ runs in seconds; heavy modules are lazy-imported.
 
 GitHub Actions workflows in `.github/workflows/`:
 - **`ci.yml`** — runs `compileall` (syntax check of *every* module) + `pytest tests/` on push/PR.
-- **`security.yml`** — scheduled/manual security scans (Bandit, gitleaks, Trivy, pip-audit).
+- **`security.yml`** — security scans on PR/push + monthly (Bandit, Semgrep OWASP, gitleaks, Trivy, pip-audit).
   When adding code, keep `python -m compileall` clean and tests passing.
 
 Linting (ruff, configured in `pyproject.toml` + `.pre-commit-config.yaml`) is intentionally lenient

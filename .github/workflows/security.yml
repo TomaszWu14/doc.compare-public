@@ -4,6 +4,8 @@ name: security
 # co miesiąc (pełny przegląd + obraz). Progi: ustalenia HIGH/CRITICAL (bandit: ≥ MEDIUM)
 # blokują. Wyjątki wyłącznie z uzasadnieniem i datą przeglądu: .trivyignore,
 # adnotacje `# nosec <id>` oraz docs/bezpieczenstwo/RYZYKA.md (sekcja „Wyjątki”).
+# Semgrep (OWASP Top 10) blokuje na PR tylko NOWE ustalenia (baseline); pełny raport doradczo.
+# Narzędzia przypięte: akcje do SHA, gitleaks/Trivy do wersji + sha256.
 
 on:
   pull_request:
@@ -26,18 +28,18 @@ jobs:
     name: Bandit (SAST)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7.0.1
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
       - name: Instalacja Bandit
-        run: pip install "bandit[toml]"
+        run: pip install "bandit[toml]==1.9.4"
       - name: Skan (ustalenia ≥ MEDIUM blokują)
         run: bandit -r . -ll -x ./.venv,./venv,./node_modules,./.git,./tests,./static
       - name: Pełny raport JSON (artefakt, wszystkie wagi)
         if: always()
         run: bandit -r . -x ./.venv,./venv,./node_modules,./.git,./tests,./static -f json -o bandit.json || true
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: bandit-json
@@ -48,12 +50,12 @@ jobs:
     name: pip-audit (SCA)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7.0.1
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"   # jak w Dockerfile — audyt tego, co trafia do obrazu
       - name: Instalacja pip-audit
-        run: pip install pip-audit
+        run: pip install "pip-audit==2.10.1"
       - name: Zestaw produkcyjny (blokuje)
         run: pip-audit -r requirements-prod.txt --progress-spinner off
       # Dockerfile instaluje requirements.txt — jeśli zestaw się nie rozwiązuje,
@@ -63,10 +65,13 @@ jobs:
       # requirements.txt to zestaw obrazu produkcyjnego (Dockerfile) — znane podatności blokują (US-029).
       - name: Zestaw obrazu produkcyjnego — requirements.txt (blokuje)
         run: pip-audit -r requirements.txt --progress-spinner off
+      # dev-requirements.txt instaluje job „Testy” w ci.yml — narzędzia CI też audytujemy.
+      - name: Zestaw CI — dev-requirements.txt (blokuje)
+        run: pip-audit -r dev-requirements.txt --progress-spinner off
       - name: Raport JSON (artefakt)
         if: always()
         run: pip-audit -r requirements-prod.txt --progress-spinner off -f json -o pip-audit.json || true
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: pip-audit-json
@@ -76,24 +81,83 @@ jobs:
   gitleaks:
     name: gitleaks (sekrety)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GITLEAKS_VERSION: 8.30.1
+      GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0   # pełna historia — skan także starych commitów
-      - uses: gitleaks/gitleaks-action@v3
+          fetch-depth: 0   # pełna historia — PR: jego commity; push/cron/ręcznie: cała historia
+      # Binarka z przypiętą wersją i sumą sha256 (zamiast gitleaks-action z ruchomym tagiem).
+      # Fałszywe alarmy: .gitleaksignore (fingerprint + uzasadnienie), czytany automatycznie.
+      - name: Instalacja gitleaks (przypięta wersja + sha256)
+        working-directory: ${{ runner.temp }}
+        run: |
+          curl -sSfL -o gitleaks.tgz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  gitleaks.tgz" | sha256sum -c -
+          tar -xzf gitleaks.tgz gitleaks
+      - name: gitleaks (blokuje)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          args=(git --redact --no-banner)
+          if [ -n "$BASE" ]; then args+=(--log-opts="$BASE..$HEAD"); fi
+          "$RUNNER_TEMP/gitleaks" "${args[@]}" .
+
+  semgrep:
+    # Semgrep p/owasp-top-ten. Na PR — BRAMKA na ustalenia wprowadzone przez PR (--baseline-commit:
+    # dług sprzed wdrożenia nie blokuje, każde NOWE ustalenie tak). Push/cron/ręcznie — pełny raport
+    # (doradczo, SARIF jako artefakt) do triage'u długu. Fałszywy alarm: `# nosemgrep: <id>` + powód obok.
+    name: Semgrep — OWASP Top 10
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0   # --baseline-commit potrzebuje commita bazowego PR-a
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Instalacja Semgrep
+        run: pip install "semgrep==1.181.0"
+      - name: Semgrep — nowe ustalenia PR-a (blokuje)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: >-
+          semgrep scan --config p/owasp-top-ten --metrics off --error --text
+          --baseline-commit "$BASE" --exclude tests --exclude docs --exclude static/vendor .
+      - name: Semgrep — pełny raport (doradczo)
+        if: github.event_name != 'pull_request'
+        run: >-
+          semgrep scan --config p/owasp-top-ten --metrics off --text --sarif-output semgrep.sarif
+          --exclude tests --exclude docs --exclude static/vendor . || true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always() && github.event_name != 'pull_request'
+        with:
+          name: semgrep-sarif
+          path: semgrep.sarif
+          if-no-files-found: ignore
 
   trivy:
     name: Trivy (zależności, sekrety, konfiguracja)
     runs-on: ubuntu-latest
+    env:
+      TRIVY_VERSION: 0.74.0
+      TRIVY_SHA256: 2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a
     steps:
-      - uses: actions/checkout@v7.0.1
-      - name: Instalacja Trivy
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Instalacja Trivy (przypięta wersja + sha256)
+        working-directory: ${{ runner.temp }}
         run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
-            | sh -s -- -b "$HOME/.local/bin"
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          curl -sSfL -o trivy.tgz \
+            "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+          echo "${TRIVY_SHA256}  trivy.tgz" | sha256sum -c -
+          tar -xzf trivy.tgz trivy
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
       - name: Skan repozytorium (HIGH/CRITICAL blokują; wyjątki w .trivyignore)
         run: |
           trivy fs --scanners vuln,secret,misconfig --severity HIGH,CRITICAL \
@@ -103,7 +167,7 @@ jobs:
         run: |
           trivy fs --scanners vuln,secret,misconfig --severity HIGH,CRITICAL \
             --ignore-unfixed --ignorefile .trivyignore --exit-code 0 --format sarif -o trivy-fs.sarif .
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: trivy-fs-sarif
@@ -119,11 +183,14 @@ jobs:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     continue-on-error: true
+    env:
+      TRIVY_VERSION: 0.74.0
+      TRIVY_SHA256: 2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a
     permissions:
       contents: read
       packages: read
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Zwolnij miejsce na dysku (obraz bazowy z torch/paddle ma kilka GB)
         run: |
           sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /opt/hostedtoolcache/CodeQL || true
@@ -132,7 +199,7 @@ jobs:
         id: meta
         run: echo "owner_lc=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
       - name: Logowanie do GHCR
-        uses: docker/login-action@v4
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -142,16 +209,19 @@ jobs:
           docker build -f Dockerfile.slim \
             --build-arg ML_BASE_IMAGE=ghcr.io/${{ steps.meta.outputs.owner_lc }}/doccompare-ml-base:latest \
             -t doccompare:ci .
-      - name: Instalacja Trivy
+      - name: Instalacja Trivy (przypięta wersja + sha256)
+        working-directory: ${{ runner.temp }}
         run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
-            | sh -s -- -b "$HOME/.local/bin"
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          curl -sSfL -o trivy.tgz \
+            "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+          echo "${TRIVY_SHA256}  trivy.tgz" | sha256sum -c -
+          tar -xzf trivy.tgz trivy
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
       - name: Skan obrazu (HIGH/CRITICAL z dostępną poprawką)
         run: |
           trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 --format table doccompare:ci
           trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 --format sarif -o trivy-image.sarif doccompare:ci
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: trivy-image-sarif
