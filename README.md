@@ -6,11 +6,9 @@
 
 ![Wynik porównania zamówienia z proformą — różnica ilości zaznaczona na czerwono](docs/screenshots/porownanie-dokumentow.png)
 
-🎞️ GIF z działania: `<DO UZUPEŁNIENIA: docs/screenshots/demo.gif — nagram>`
+<!-- DO UZUPEŁNIENIA (autor): GIF docs/screenshots/demo.gif i link do 2-min wideo — dodać tutaj, gdy będą nagrane. -->
 
-📹 Prezentacja działania — 2 min: `<DO UZUPEŁNIENIA: link YouTube>`
-
-🌐 Demo: **[doc.compare.twapp.pl](https://doc.compare.twapp.pl)** — działająca instancja (dane syntetyczne, bez kluczy AI). Logowanie tylko dla autora, bez konta gościa; przebieg pokazuje wideo. Lokalnie uruchomisz ją w kilka minut ([niżej](#jak-uruchomić)).
+🌐 Demo: **[doc.compare.twapp.pl](https://doc.compare.twapp.pl)** — działająca instancja (dane syntetyczne, bez kluczy AI). Logowanie tylko dla autora (konto gościa jest w kodzie, ale domyślnie wyłączone). Lokalnie uruchomisz aplikację w kilka minut ([niżej](#jak-uruchomić)).
 
 > **Projekt portfolio.** Nazwy firm są zastąpione fikcyjnymi (ACME), dane demo i testowe są syntetyczne.
 
@@ -103,7 +101,7 @@ Funkcje OCR, ML i walidacja AI wymagają pełnego `requirements.txt` oraz kluczy
 | **Reguły deterministyczne + opcjonalnie API Claude** | O zgodności decydują reguły i tolerancje z profilu dostawcy; AI ocenia ryzyko na gotowym wyniku, a jej sugestie czekają na akceptację managera. Aplikacja działa bez klucza API ([D-01](docs/06-decyzje.md)). |
 | **SQLite (dev) / PostgreSQL (prod) przez `db.py`** | Jedna warstwa tłumaczy dialekty SQL, więc lokalnie nie trzeba stawiać serwera bazy ([D-04](docs/06-decyzje.md)). |
 | **Wątki + RQ/Redis z fallbackiem** | Ciężkie zadania (paczki artworków, ekstrakcja) nie blokują żądania HTTP; bez Redisa działają w wątkach ([D-06](docs/06-decyzje.md)). |
-| **Docker + gunicorn** | Oryginał był wdrażany jako kontener na Coolify / Hetzner; ta kopia portfolio nie ma workflow wdrożenia. |
+| **Docker + gunicorn** | Demo działa jako kontener na Coolify (Hetzner); po zielonym CI na `main` workflow [`deploy.yml`](.github/workflows/deploy.yml) zleca jego przebudowę. |
 | **Alpine.js, Tailwind, Chart.js** | Interaktywność w szablonach Jinja bez frameworka SPA. |
 | **pytest + GitHub Actions** | ~600 testów czystej logiki uruchamianych w CI w kilkadziesiąt sekund; ciężkie importy ML są leniwe ([D-11](docs/06-decyzje.md)). |
 
@@ -128,7 +126,7 @@ Historia commitów została spłaszczona przy przygotowaniu wersji portfolio (an
 
 ## Kontekst projektu
 
-`<DO UZUPEŁNIENIA: w jakiej roli i dla kogo powstał projekt, okres, ilu użytkowników>`
+<!-- DO UZUPEŁNIENIA (autor): w jakiej roli i dla kogo powstał projekt, okres, ilu użytkowników. -->
 
 **Mój wkład.** Jestem jedynym autorem: analiza procesu z działami zakupów i logistyki, model danych,
 kaskada ekstrakcji, silnik porównania, interfejs, testy i wdrożenie. Skala: ~600 testów, ~410 tras
