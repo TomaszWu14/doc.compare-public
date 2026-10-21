@@ -2,6 +2,8 @@
 
 [![ci](https://github.com/TomaszWu14/doc.compare-public/actions/workflows/ci.yml/badge.svg)](https://github.com/TomaszWu14/doc.compare-public/actions/workflows/ci.yml)
 
+🇵🇱 Polski · 🇬🇧 [English version](README.en.md)
+
 **Porównuje dokumenty importowe (zamówienie, proformę, fakturę, listę pakową, zgłoszenie celne) linia po linii i zatrzymuje dostawę, zanim rozbieżność ilości lub ceny dotrze do odprawy — dla działów zakupów i logistyki.**
 
 ![Wynik porównania zamówienia z proformą — różnica ilości zaznaczona na czerwono](docs/screenshots/porownanie-dokumentow.png)
