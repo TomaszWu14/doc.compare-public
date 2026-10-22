@@ -6,7 +6,7 @@ See `CLAUDE.md` for full project overview, architecture, conventions, and common
 
 ### Service overview
 
-DocCompare v6 is a single monolithic Flask app (`app.py`). There is no separate frontend build step, no Docker, and no external services required for local dev. SQLite is the default dev database (auto-created at `instance/doccompare.db`).
+DocCompare v6 is a single monolithic Flask app (`app.py`). There is no separate frontend build step and no external services required for local dev (Dockerfiles exist for production/demo builds, but are not needed locally). SQLite is the default dev database (auto-created at `instance/doccompare.db`).
 
 ### Running the dev server
 
@@ -41,7 +41,7 @@ The VM update script installs Python packages only. These system packages must b
 
 ### Gotchas
 
-- There is **no test suite or linter** configured in this repo. Testing is done manually via the web UI.
+- Tests: `python3 -m pytest tests/ -q` (pure-logic suite, heavy ML deps are skipped); lint: `ruff check .`. CI (`.github/workflows/ci.yml`) runs both plus `compileall`.
 - The `python` command is not available; always use `python3`.
 - The `.env` file must exist with at least `SECRET_KEY` and `SQLITE_PATH=instance/doccompare.db` set. Copy from `.env.example` if missing.
 - `ANTHROPIC_API_KEY` is required for AI validation features but the app starts fine without it; AI-dependent routes will error at runtime.

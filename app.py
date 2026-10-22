@@ -20327,5 +20327,5 @@ if __name__ == "__main__":
     print("=" * 60)
     _debug = os.environ.get("FLASK_DEBUG", "0") == "1" or os.environ.get("FLASK_ENV") == "development"
     # Debugger Werkzeuga (RCE) nigdy nie wystawiany w sieci — w debug tylko localhost.
-    # bandit: 0.0.0.0 celowo: dostęp z LAN wg README.txt; w trybie debug host=127.0.0.1
+    # bandit: 0.0.0.0 celowo: dostęp z LAN wg docs/URUCHOMIENIE_WINDOWS.md; w trybie debug host=127.0.0.1
     app.run(debug=_debug, host="127.0.0.1" if _debug else "0.0.0.0", port=5000)  # nosec B104

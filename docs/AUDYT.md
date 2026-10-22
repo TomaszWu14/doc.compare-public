@@ -2,7 +2,7 @@
 
 > Audyt otwierający pracę zespołową (role **[BA]** analityk biznesowy, **[DEV]** developer, **[SEC]** bezpieczeństwo).
 > Stan kodu: gałąź `main`, commit `ef950bb` (2026-10-12). Żaden plik kodu nie został zmieniony — to wyłącznie analiza.
-> Poprzedni audyt techniczny: `AUDIT_2026-06-08.md` (101 ustaleń). Dokumentacja analityczna z 2026-10: `docs/01…07-*.md`.
+> Poprzedni audyt techniczny: [`AUDIT_2026-06-08.md`](AUDIT_2026-06-08.md) (101 ustaleń). Dokumentacja analityczna z 2026-10: `docs/01…07-*.md`.
 > Numery linii dotyczą commita `ef950bb`.
 
 Legenda wag: 🔴 krytyczne · 🟠 wysokie · 🟡 średnie · ⚪ niskie · ℹ️ informacja.
@@ -301,13 +301,13 @@ Pozycje ℹ️ do świadomej akceptacji: brak globalnej bramki auth (ochrona opt
 | Klasa | Przykłady w systemie |
 |---|---|
 | Dane osobowe | `users.email/username`, `audit_log.username/ip`, `drivers.name/phone`, kontakty spedytorów i agentów, kontakty dostawców (`blueprints/suppliers.py:513`) |
-| Poufne handlowo | ceny i warunki płatności z PO/PI/CI, profile dostawców z tolerancjami, master data materiałów (EAN, CN), artworki wzorcowe (zasada „nie opuszczają Z:” z `AUDIT_2026-06-08.md`, pyt. 59) |
+| Poufne handlowo | ceny i warunki płatności z PO/PI/CI, profile dostawców z tolerancjami, master data materiałów (EAN, CN), artworki wzorcowe (zasada „nie opuszczają Z:” z `docs/AUDIT_2026-06-08.md`, pyt. 59) |
 | Wewnętrzne | statusy dostaw, KPI, konfiguracja SLA/demurrage, słowniki |
 | Sekrety | `SECRET_KEY`, klucze API w env i w `settings` (patrz ryzyko 2), tokeny intake/biblioteki, token kierowcy |
 
 Dane poufne i osobowe wychodzą do podmiotów trzecich: Anthropic (treść dokumentów do walidacji i uczenia, obrazy do Vision), Mistral (OCR), Resend (e-maile), API trackingu (numery kontenerów), dostawcy SMS (telefony kierowców), Sentry (nazwa użytkownika, IP). Umowy powierzenia i minimalizacja danych do decyzji PO.
 
-### 4.5 Status ustaleń bezpieczeństwa z `AUDIT_2026-06-08.md`
+### 4.5 Status ustaleń bezpieczeństwa z `docs/AUDIT_2026-06-08.md`
 
 | Czerwiec | Ustalenie | Status 2026-10-15 | Dowód |
 |---|---|---|---|
