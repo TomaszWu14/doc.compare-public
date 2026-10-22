@@ -29,7 +29,7 @@ opencv-python-headless>=4.8
 
 # ── Analiza wizualna (artwork diff) ──────────────────────
 scikit-image>=0.22             # SSIM structural similarity — lepsza metryka niż raw pixel diff
-imagehash>=4.3                 # Perceptual hashing — szybki pre-filtr "czy obrazy identyczne"
+imagehash>=4.3.2                 # Perceptual hashing — szybki pre-filtr "czy obrazy identyczne"
 
 # ── Deep-learning matching + similarity ─────────────────
 # lightglue not on PyPI — install from upstream repo (cvg/LightGlue)
