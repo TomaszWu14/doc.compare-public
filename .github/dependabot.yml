@@ -14,6 +14,17 @@ updates:
     cooldown:
       default-days: 7
     labels: ["dependencies", "SEC"]
+    # Wersje major ciężkich bibliotek ML zmieniają API/modele — wymagają ręcznych testów
+    # (OCR, YOLO, ładowanie modeli), więc Dependabot proponuje tylko minor/patch.
+    ignore:
+      - dependency-name: "ultralytics"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "python-doctr"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "accelerate"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "scikit-learn"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch:
         update-types: ["minor", "patch"]
