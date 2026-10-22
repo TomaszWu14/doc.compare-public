@@ -52,8 +52,14 @@ jobs:
         run: ruff check . --output-format concise --statistics
 
   pytest:
-    name: Testy (pytest + pokrycie)
+    # Nazwa dla 3.11 bez sufiksu — bez zmiany nazwy wymaganego checku; 3.14 dostaje sufiks.
+    name: Testy (pytest + pokrycie)${{ matrix.python-version != '3.11' && format(' — Python {0}', matrix.python-version) || '' }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.11 = wersja obrazu produkcyjnego; 3.14 = najnowsza, wczesne ostrzeżenie o niezgodnościach.
+        python-version: ['3.11', '3.14']
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -61,7 +67,7 @@ jobs:
       - name: Konfiguracja Pythona
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.python-version }}
 
       - name: Kompilacja składni całego repo
         # Łapie błędy składni w KAŻDYM module (nie tylko importowanym przez testy).
@@ -81,7 +87,7 @@ jobs:
         run: python -m pytest tests/ -q -rs --cov=. --cov-report=term --cov-report=xml:coverage.xml
 
       - name: Artefakt — raport pokrycia
-        if: always()
+        if: always() && matrix.python-version == '3.11'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage-xml
