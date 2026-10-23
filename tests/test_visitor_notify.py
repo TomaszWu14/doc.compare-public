@@ -105,6 +105,69 @@ def test_body_przyciete_do_300_znakow():
     assert len(req.data.decode("utf-8")) == 300
 
 
-def test_klauzula_wspomina_ntfy():
-    assert "ntfy" in dg.GDPR_PL and "poza tym nikomu danych nie przekazuję" in dg.GDPR_PL
-    assert "ntfy" in dg.GDPR_EN and "apart from that I do not share" in dg.GDPR_EN
+def test_klauzula_wspomina_ntfy_i_aktywnosc():
+    assert (
+        "O każdej wizycie (imię, nazwisko, firma) dostaję powiadomienie na telefon przez usługę "
+        "powiadomień push ntfy. Zapisuję też, ile i jakie ekrany wersji demonstracyjnej "
+        "obejrzałeś (bez adresu IP), żeby wiedzieć, co zainteresowało gości. Poza tym nikomu "
+        "danych nie przekazuję." in dg.GDPR_PL
+    )
+    assert (
+        "I receive a phone notification of each visit (first name, last name, company) via the "
+        "ntfy push notification service. I also record how many and which screens of the demo "
+        "you viewed (without your IP address) to see what visitors find interesting. Apart from "
+        "that I do not share the data with anyone." in dg.GDPR_EN
+    )
+
+
+# ── A. Alarm „uwaga, ta firma” (NTFY_WATCH_COMPANIES) ───────────────────────────
+
+
+def _headers(req):
+    return {k.lower(): v for k, v in req.header_items()}
+
+
+def test_firma_z_listy_daje_alarm(client, sent, monkeypatch):
+    monkeypatch.setenv("NTFY_WATCH_COMPANIES", "globex, acme")
+    assert _post(client, company="ÄCME sp. z o.o.").status_code == 302
+    req = sent[0][0]
+    h = _headers(req)
+    assert h["priority"] == "urgent" and h["tags"] == "rotating_light"
+    assert h["title"] == "UWAGA firma z listy: DocCompare"
+    assert all(v.isascii() for v in h.values())
+    assert req.data.decode("utf-8") == "⚠️ Jan Kowalski (ÄCME sp. z o.o.) wszedł do DocCompare"
+
+
+@pytest.mark.parametrize(
+    "company,phrases,hit",
+    [
+        ("Łódzka  Firma  Testowa", "lodzka firma", True),
+        ("ZAŻÓŁĆ Sp. z o.o.", "zazolc", True),
+        ("Inna firma", "acme", False),
+        ("ACME", "", False),
+        ("ACME", " , a ,", False),  # frazy krótsze niż 2 znaki są ignorowane
+    ],
+)
+def test_dopasowanie_firmy(monkeypatch, company, phrases, hit):
+    monkeypatch.setenv("NTFY_WATCH_COMPANIES", phrases)
+    assert vn.is_watched(company) is hit
+
+
+def test_brak_trafienia_zwykly_push(client, sent, monkeypatch):
+    monkeypatch.setenv("NTFY_WATCH_COMPANIES", "globex")
+    assert _post(client).status_code == 302
+    h = _headers(sent[0][0])
+    assert h["priority"] == "high" and h["tags"] == "bell"
+
+
+def test_pusta_lista_zwykly_push(client, sent, monkeypatch):
+    monkeypatch.setenv("NTFY_WATCH_COMPANIES", "")
+    assert _post(client).status_code == 302
+    assert _headers(sent[0][0])["title"] == "Nowy gosc: DocCompare"
+
+
+def test_alarm_bez_ntfy_url_nic_nie_wysyla(client, sent, monkeypatch):
+    monkeypatch.delenv("NTFY_URL")
+    monkeypatch.setenv("NTFY_WATCH_COMPANIES", "acme")
+    assert _post(client).status_code == 302
+    assert sent == []

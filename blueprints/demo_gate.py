@@ -13,9 +13,12 @@ Włączanie (patrz `gate_enabled`):
 Znacznik „przedstawił się” to PODPISANE ciasteczko `visitor_ok` (30 dni). Celowo nie sesja
 Flask: ta żyje 8 h, a logowanie robi `session.clear()`.
 
-Przechowujemy wyłącznie imię, nazwisko, firmę i datę (bez IP i user-agenta); wpisy starsze
-niż 90 dni kasujemy przy każdym zapisie. Po udanym zapisie: push ntfy (blueprints/visitor_notify.py,
-no-op bez NTFY_URL). Import: core/db (blueprint → core, nigdy → app).
+Przechowujemy wyłącznie imię, nazwisko, firmę, datę i aktywność w demo (liczba i sekcje
+obejrzanych ekranów, ostatnia wizyta — blueprints/visitor_activity.py), bez IP i user-agenta;
+wpisy starsze niż 90 dni kasujemy przy każdym zapisie. Ciasteczko niesie podpisane id wpisu
+(`{"id": N}`); stare ciasteczka `"ok"` (sprzed liczenia aktywności) nadal wpuszczają, ale nie są
+liczone. Po udanym zapisie: push ntfy (blueprints/visitor_notify.py, no-op bez NTFY_URL).
+Import: core/db (blueprint → core, nigdy → app).
 """
 
 from __future__ import annotations
@@ -39,6 +42,7 @@ from core.audit import log_audit as _log_audit
 from core.security import require_role, verify_csrf
 from db import get_db
 
+from blueprints import visitor_activity as _activity
 from blueprints.visitor_notify import notify_visitor
 
 bp = Blueprint("demo_gate", __name__)
@@ -71,7 +75,9 @@ GDPR_PL = (
     "demonstracyjnej i statystyki odwiedzin portfolio, na podstawie prawnie uzasadnionego interesu "
     "(art. 6 ust. 1 lit. f RODO). Dane przechowuję 90 dni, potem są automatycznie usuwane. "
     "O każdej wizycie (imię, nazwisko, firma) dostaję powiadomienie na telefon przez usługę "
-    "powiadomień push ntfy; poza tym nikomu danych nie przekazuję. Masz prawo dostępu do danych, ich sprostowania, usunięcia, ograniczenia "
+    "powiadomień push ntfy. Zapisuję też, ile i jakie ekrany wersji demonstracyjnej obejrzałeś "
+    "(bez adresu IP), żeby wiedzieć, co zainteresowało gości. Poza tym nikomu danych nie "
+    "przekazuję. Masz prawo dostępu do danych, ich sprostowania, usunięcia, ograniczenia "
     "przetwarzania i sprzeciwu – napisz na adres powyżej. Przysługuje Ci skarga do Prezesa UODO."
 )
 GDPR_EN = (
@@ -79,8 +85,9 @@ GDPR_EN = (
     "first name, last name and company name solely to control access to the demo version and to "
     "compile portfolio visit statistics, based on legitimate interest (Art. 6(1)(f) GDPR). I keep the "
     "data for 90 days, after which it is deleted automatically. I receive a phone notification of "
-    "each visit (first name, last name, company) via the ntfy push notification service; apart "
-    "from that I do not share the data with anyone. You have the "
+    "each visit (first name, last name, company) via the ntfy push notification service. I also "
+    "record how many and which screens of the demo you viewed (without your IP address) to see "
+    "what visitors find interesting. Apart from that I do not share the data with anyone. You have the "
     "right of access, rectification, erasure, restriction of processing and objection - write to the "
     "address above. You may lodge a complaint with the Polish data protection authority (UODO)."
 )
@@ -140,41 +147,60 @@ def _serializer() -> URLSafeTimedSerializer:
     return URLSafeTimedSerializer(current_app.secret_key, salt="demo-visitor-gate")
 
 
-def has_pass() -> bool:
+def _pass_payload():
     tok = request.cookies.get(COOKIE_NAME)
     if not tok:
-        return False
+        return None
     try:
-        return _serializer().loads(tok, max_age=COOKIE_MAX_AGE) == "ok"
+        return _serializer().loads(tok, max_age=COOKIE_MAX_AGE)
     except BadSignature:
-        return False
+        return None
+
+
+def _payload_id(payload) -> int | None:
+    vid = payload.get("id") if isinstance(payload, dict) else None
+    return vid if isinstance(vid, int) and not isinstance(vid, bool) and vid > 0 else None
+
+
+def has_pass() -> bool:
+    payload = _pass_payload()
+    return payload == "ok" or _payload_id(payload) is not None
+
+
+def visitor_id() -> int | None:
+    """Id wpisu gościa z podpisanego ciasteczka; None dla braku/podróbki/starej flagi „ok”."""
+    return _payload_id(_pass_payload())
 
 
 def ensure_table(db) -> None:
     db.execute(
         "CREATE TABLE IF NOT EXISTS demo_visitors ("
         "id INTEGER PRIMARY KEY AUTOINCREMENT, first_name TEXT NOT NULL, "
-        "last_name TEXT NOT NULL, company TEXT NOT NULL, created_at TEXT NOT NULL)"
+        "last_name TEXT NOT NULL, company TEXT NOT NULL, created_at TEXT NOT NULL, "
+        "page_views INTEGER NOT NULL DEFAULT 0, last_seen_at TEXT, sections TEXT)"
     )
+    _activity.ensure_columns(db)
 
 
 def _ts(dt: datetime) -> str:
     return dt.strftime("%Y-%m-%d %H:%M:%S")
 
 
-def save_visitor(db, first: str, last: str, company: str, now: datetime | None = None) -> None:
-    """Zapisuje wpis i kasuje wpisy starsze niż 90 dni (zapytania parametryzowane)."""
+def save_visitor(db, first: str, last: str, company: str, now: datetime | None = None):
+    """Zapisuje wpis, kasuje wpisy starsze niż 90 dni; zwraca id nowego wpisu."""
     now = now or datetime.now(timezone.utc)
     ensure_table(db)
     db.execute(
         "DELETE FROM demo_visitors WHERE created_at < ?",
         (_ts(now - timedelta(days=RETENTION_DAYS)),),
     )
-    db.execute(
+    cur = db.execute(
         "INSERT INTO demo_visitors(first_name, last_name, company, created_at) VALUES (?,?,?,?)",
         (first, last, company, _ts(now)),
     )
+    vid = cur.lastrowid
     db.commit()
+    return vid
 
 
 def _safe_next(value: str | None) -> str:
@@ -205,6 +231,25 @@ def _gate():
     return redirect(url_for("demo_gate.gate"))
 
 
+@bp.after_app_request
+def _track(resp):
+    """Liczy obejrzany ekran: udany (2xx) GET strony HTML od gościa z id w ciasteczku."""
+    try:
+        if (
+            request.method == "GET"
+            and 200 <= resp.status_code < 300
+            and resp.mimetype == "text/html"
+            and not is_exempt(request.path)
+            and gate_enabled()
+        ):
+            vid = visitor_id()
+            if vid is not None:
+                _activity.record_view(vid, request.path)
+    except Exception as exc:  # noqa: BLE001 — liczenie nie może psuć odpowiedzi
+        current_app.logger.warning("Liczenie aktywności gościa pominięte: %s", type(exc).__name__)
+    return resp
+
+
 @bp.route(GATE_PATH, methods=["GET", "POST"])
 def gate():
     if not gate_enabled():
@@ -228,14 +273,14 @@ def gate():
             else:
                 db = get_db()
                 try:
-                    save_visitor(db, *vals)
+                    vid = save_visitor(db, *vals)
                 finally:
                     db.close()
                 notify_visitor(*vals)
                 resp = redirect(nxt)
                 resp.set_cookie(
                     COOKIE_NAME,
-                    _serializer().dumps("ok"),
+                    _serializer().dumps({"id": vid} if vid else "ok"),
                     max_age=COOKIE_MAX_AGE,
                     httponly=True,
                     samesite="Lax",
@@ -254,12 +299,15 @@ def visitors():
     try:
         ensure_table(db)
         rows = db.execute(
-            "SELECT id, first_name, last_name, company, created_at FROM demo_visitors "
+            "SELECT id, first_name, last_name, company, created_at, page_views, last_seen_at, "
+            "sections FROM demo_visitors "
             "ORDER BY created_at DESC, id DESC"
         ).fetchall()
     finally:
         db.close()
     _log_audit("demo_visitors_view", session.get("username"), f"{len(rows)} wpisów")
     return render_template(
-        "demo_visitors.html", rows=[dict(r) for r in rows], retention=RETENTION_DAYS
+        "demo_visitors.html",
+        rows=[_activity.enrich(dict(r)) for r in rows],
+        retention=RETENTION_DAYS,
     )
