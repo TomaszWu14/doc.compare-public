@@ -205,11 +205,13 @@ from blueprints.incoterms import bp as _incoterms_bp, ensure_incoterms_table as 
 from blueprints.translation_dict import bp as _translation_dict_bp
 from blueprints.transit_countries import bp as _transit_bp, list_countries as _list_transit_countries
 from blueprints.palviz import bp as _palviz_bp
+from blueprints.demo_gate import bp as _demo_gate_bp
 from blueprints.suppliers import bp as _suppliers_bp
 from blueprints.warehouse import bp as _warehouse_bp
 from blueprints.kolejka import bp as _kolejka_bp
 from blueprints.api_invoices import bp as _api_invoices_bp
 from invoice_routes import invoice_bp
+app.register_blueprint(_demo_gate_bp)  # bramka odwiedzin demo (DEMO_VISITOR_GATE)
 app.register_blueprint(_auth_bp)
 app.register_blueprint(_incoterms_bp)
 app.register_blueprint(_translation_dict_bp)
