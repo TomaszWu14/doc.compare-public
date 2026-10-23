@@ -36,6 +36,8 @@ Opcjonalne: `ANTHROPIC_API_KEY`, `MISTRAL_API_KEY`, `RESEND_API_KEY`/`EMAIL_FROM
 `WEB_CONCURRENCY`, `THREADS_PER_WORKER`, `DB_POOL_SIZE`, `LOG_DIR`, `LOG_LEVEL`, `PROXY_COUNT`, `FORCE_HTTPS`.
 `DEMO_LOGIN` (tylko demo): przycisk „Wejdź jako demo” na stronie logowania; sesja tylko do odczytu (każdy zapis → 403).
 `NTFY_URL` (+ opcjonalny `NTFY_TOKEN`, tylko demo): push ntfy na telefon o każdym gościu bramki odwiedzin; puste = wyłączone.
+`NTFY_WATCH_COMPANIES` (tylko demo, wartość tylko w Coolify): frazy firm po przecinku → push „UWAGA firma z listy” z priorytetem urgent.
+`NTFY_ENGAGED_VIEWS` (domyślnie 10; 0 = wyłączone): jeden push, gdy gość obejrzy tyle ekranów demo. Aktywność gości (ekrany, czas, sekcje) widać na `/admin/demo-visitors`.
 Pełna lista z opisami: `.env.example`. Walidator startowy przerywa start produkcji przy niepewnym `SECRET_KEY`.
 
 ## 4. Backup i odtwarzanie

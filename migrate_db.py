@@ -307,7 +307,10 @@ def run():
             first_name TEXT NOT NULL,
             last_name TEXT NOT NULL,
             company TEXT NOT NULL,
-            created_at TEXT NOT NULL
+            created_at TEXT NOT NULL,
+            page_views INTEGER NOT NULL DEFAULT 0,
+            last_seen_at TEXT,
+            sections TEXT
         )
     """, "demo_visitors")
 
@@ -406,6 +409,12 @@ def run():
             FOREIGN KEY(created_by) REFERENCES users(id)
         )
     """, "comparison_templates")
+
+    print("\n── Kolumny tabeli: demo_visitors ──")
+    # Aktywność gościa demo (blueprints/visitor_activity.py): ekrany, ostatnia wizyta, sekcje (JSON).
+    add_column(db, "demo_visitors", "page_views", "INTEGER NOT NULL DEFAULT 0")
+    add_column(db, "demo_visitors", "last_seen_at", "TEXT")
+    add_column(db, "demo_visitors", "sections", "TEXT")
 
     print("\n── Kolumny tabeli: comparisons ──")
     add_column(db, "comparisons", "po_number",       "TEXT DEFAULT ''")

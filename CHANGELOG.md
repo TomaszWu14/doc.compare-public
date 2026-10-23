@@ -6,6 +6,12 @@ Wersja aplikacji: `constants.APP_VERSION`.
 ## [Unreleased]
 
 ### Added
+- Monitoring gości demo v2: alarm „UWAGA firma z listy” (`NTFY_WATCH_COMPANIES`, dopasowanie bez wielkości
+  liter i polskich znaków → push `urgent`); aktywność gościa (`demo_visitors.page_views`, `last_seen_at`,
+  `sections` — liczone udane GET-y stron HTML przez hook `after_app_request` w `blueprints/demo_gate.py`,
+  logika w `blueprints/visitor_activity.py`; ciasteczko `visitor_ok` niesie teraz podpisane id wpisu);
+  kolumny „Ekrany”, „Czas”, „Najczęściej” na `/admin/demo-visitors`; push „Gość ogląda demo” po
+  `NTFY_ENGAGED_VIEWS` ekranach (domyślnie 10). Klauzula RODO bramki (PL/EN) informuje o zapisie aktywności.
 - Powiadomienie push (ntfy) o każdym nowym gościu bramki demo (`blueprints/visitor_notify.py`): env
   `NTFY_URL` (+ opcjonalny `NTFY_TOKEN`), wysyłka w tle, bez `NTFY_URL` no-op; klauzula RODO bramki (PL/EN)
   informuje o powiadomieniu przez ntfy.
