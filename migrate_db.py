@@ -300,6 +300,17 @@ def run():
         )
     """, "supplier_audit_log")
 
+    # Bramka odwiedzin demo (blueprints/demo_gate.py): bez IP i user-agenta, retencja 90 dni.
+    create_table(db, """
+        CREATE TABLE IF NOT EXISTS demo_visitors (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            first_name TEXT NOT NULL,
+            last_name TEXT NOT NULL,
+            company TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+    """, "demo_visitors")
+
     create_table(db, """
         CREATE TABLE IF NOT EXISTS supplier_analysis_log (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
