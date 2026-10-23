@@ -14,7 +14,8 @@ Znacznik „przedstawił się” to PODPISANE ciasteczko `visitor_ok` (30 dni). 
 Flask: ta żyje 8 h, a logowanie robi `session.clear()`.
 
 Przechowujemy wyłącznie imię, nazwisko, firmę i datę (bez IP i user-agenta); wpisy starsze
-niż 90 dni kasujemy przy każdym zapisie. Import: core/db (blueprint → core, nigdy → app).
+niż 90 dni kasujemy przy każdym zapisie. Po udanym zapisie: push ntfy (blueprints/visitor_notify.py,
+no-op bez NTFY_URL). Import: core/db (blueprint → core, nigdy → app).
 """
 
 from __future__ import annotations
@@ -37,6 +38,8 @@ from itsdangerous import BadSignature, URLSafeTimedSerializer
 from core.audit import log_audit as _log_audit
 from core.security import require_role, verify_csrf
 from db import get_db
+
+from blueprints.visitor_notify import notify_visitor
 
 bp = Blueprint("demo_gate", __name__)
 
@@ -66,15 +69,18 @@ GDPR_PL = (
     "Administratorem danych jest Tomasz Wierzbowski (kontakt: tomasz.wierzbowski@op.pl). "
     "Imię, nazwisko i nazwę firmy przetwarzam wyłącznie w celu kontroli dostępu do wersji "
     "demonstracyjnej i statystyki odwiedzin portfolio, na podstawie prawnie uzasadnionego interesu "
-    "(art. 6 ust. 1 lit. f RODO). Dane przechowuję 90 dni, potem są automatycznie usuwane, i nikomu "
-    "ich nie przekazuję. Masz prawo dostępu do danych, ich sprostowania, usunięcia, ograniczenia "
+    "(art. 6 ust. 1 lit. f RODO). Dane przechowuję 90 dni, potem są automatycznie usuwane. "
+    "O każdej wizycie (imię, nazwisko, firma) dostaję powiadomienie na telefon przez usługę "
+    "powiadomień push ntfy; poza tym nikomu danych nie przekazuję. Masz prawo dostępu do danych, ich sprostowania, usunięcia, ograniczenia "
     "przetwarzania i sprzeciwu – napisz na adres powyżej. Przysługuje Ci skarga do Prezesa UODO."
 )
 GDPR_EN = (
     "The data controller is Tomasz Wierzbowski (contact: tomasz.wierzbowski@op.pl). I process your "
     "first name, last name and company name solely to control access to the demo version and to "
-    "compile portfolio visit statistics, based on legitimate interest (Art. 6(1)(f) GDPR). Data is "
-    "kept for 90 days and then deleted automatically; it is not shared with anyone. You have the "
+    "compile portfolio visit statistics, based on legitimate interest (Art. 6(1)(f) GDPR). I keep the "
+    "data for 90 days, after which it is deleted automatically. I receive a phone notification of "
+    "each visit (first name, last name, company) via the ntfy push notification service; apart "
+    "from that I do not share the data with anyone. You have the "
     "right of access, rectification, erasure, restriction of processing and objection - write to the "
     "address above. You may lodge a complaint with the Polish data protection authority (UODO)."
 )
@@ -225,6 +231,7 @@ def gate():
                     save_visitor(db, *vals)
                 finally:
                     db.close()
+                notify_visitor(*vals)
                 resp = redirect(nxt)
                 resp.set_cookie(
                     COOKIE_NAME,
