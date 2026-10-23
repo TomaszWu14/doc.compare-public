@@ -67,6 +67,14 @@ def test_login_przekierowuje_na_bramke(client):
     )
 
 
+def test_klauzula_nie_ujawnia_adresu_email(client):
+    html = client.get("/demo-gate").get_data(as_text=True)
+    assert "tomasz.wierzbowski@op.pl" not in html
+    assert "tomasz.wierzbowski [at] op.pl" in html
+    for tekst in (dg.GDPR_PL, dg.GDPR_EN):
+        assert "@" not in tekst
+
+
 def test_brak_danych_odmowa(client):
     for over in (
         {"first": ""},
