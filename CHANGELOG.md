@@ -6,6 +6,9 @@ Wersja aplikacji: `constants.APP_VERSION`.
 ## [Unreleased]
 
 ### Added
+- Powiadomienie push (ntfy) o każdym nowym gościu bramki demo (`blueprints/visitor_notify.py`): env
+  `NTFY_URL` (+ opcjonalny `NTFY_TOKEN`), wysyłka w tle, bez `NTFY_URL` no-op; klauzula RODO bramki (PL/EN)
+  informuje o powiadomieniu przez ntfy.
 - Wspólna podstawa bezpieczeństwa: job Semgrep `p/owasp-top-ten` w `security.yml` (na PR bramka na nowe
   ustalenia, pełny raport doradczo), pip-audit także dla `dev-requirements.txt`, Dependabot dla obrazów Docker,
   nagłówki `Cross-Origin-Opener-Policy: same-origin` i `Cache-Control: no-store` dla odpowiedzi JSON
