@@ -70,7 +70,7 @@ _TRUE = {"1", "true", "yes", "on", "tak"}
 _FALSE = {"0", "false", "no", "off", "nie"}
 
 GDPR_PL = (
-    "Administratorem danych jest Tomasz Wierzbowski (kontakt: tomasz.wierzbowski@op.pl). "
+    "Administratorem danych jest Tomasz Wierzbowski (kontakt: tomasz.wierzbowski [at] op.pl). "
     "Imię, nazwisko i nazwę firmy przetwarzam wyłącznie w celu kontroli dostępu do wersji "
     "demonstracyjnej i statystyki odwiedzin portfolio, na podstawie prawnie uzasadnionego interesu "
     "(art. 6 ust. 1 lit. f RODO). Dane przechowuję 90 dni, potem są automatycznie usuwane. "
@@ -81,7 +81,7 @@ GDPR_PL = (
     "przetwarzania i sprzeciwu – napisz na adres powyżej. Przysługuje Ci skarga do Prezesa UODO."
 )
 GDPR_EN = (
-    "The data controller is Tomasz Wierzbowski (contact: tomasz.wierzbowski@op.pl). I process your "
+    "The data controller is Tomasz Wierzbowski (contact: tomasz.wierzbowski [at] op.pl). I process your "
     "first name, last name and company name solely to control access to the demo version and to "
     "compile portfolio visit statistics, based on legitimate interest (Art. 6(1)(f) GDPR). I keep the "
     "data for 90 days, after which it is deleted automatically. I receive a phone notification of "

@@ -6,6 +6,8 @@ Wersja aplikacji: `constants.APP_VERSION`.
 ## [Unreleased]
 
 ### Added
+- Adres kontaktowy w klauzuli RODO bramki demo (PL/EN) zapisany jako `tomasz.wierzbowski [at] op.pl`, żeby nie dał się zebrać botom
+  zbierającym adresy (`blueprints/demo_gate.py`, `tests/test_demo_gate.py`).
 - Monitoring gości demo v2: alarm „UWAGA firma z listy” (`NTFY_WATCH_COMPANIES`, dopasowanie bez wielkości
   liter i polskich znaków → push `urgent`); aktywność gościa (`demo_visitors.page_views`, `last_seen_at`,
   `sections` — liczone udane GET-y stron HTML przez hook `after_app_request` w `blueprints/demo_gate.py`,
