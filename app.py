@@ -13852,6 +13852,13 @@ def _is_ssrf_blocked_url(url: str) -> bool:
     return False
 
 
+class _NoRedirectHandler(__import__("urllib.request").request.HTTPRedirectHandler):
+    """Webhooki nie podążają za przekierowaniami (obejście SSRF przez 3xx → adres wewnętrzny)."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None  # 3xx kończy się HTTPError → dostawa uznana za nieudaną
+
+
 def _fire_webhooks(event: str, payload: dict):
     """Wysyła payload JSON do wszystkich aktywnych webhooków pasujących do eventu.
 
@@ -13885,7 +13892,8 @@ def _fire_webhooks(event: str, payload: dict):
                 headers["X-DocCompare-Signature"] = f"sha256={sig}"
             req = _ur.Request(row["url"], data=body, headers=headers, method="POST")
             # bandit: URL webhooka: http(s) wymuszone przy zapisie + _is_ssrf_blocked_url (schemat/prywatne IP)
-            with _ur.urlopen(req, timeout=10) as _resp:  # nosec B310
+            _opener = _ur.build_opener(_NoRedirectHandler)
+            with _opener.open(req, timeout=10) as _resp:  # nosec B310
                 pass
         except Exception as _e:
             logger.warning("webhook delivery failed to %s: %s", row["url"], _e)
