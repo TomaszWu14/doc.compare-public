@@ -63,7 +63,7 @@ python-dotenv>=1.0.0
 
 # ── Kolejkowanie zadań (Poziom 1 — opcjonalne) ───────────────────────────────
 rq>=1.16
-redis>=5.0
+redis>=8.1.0
 
 # ── Artwork 3D ────────────────────────────────────────────────────────────────
 trimesh>=4.0
