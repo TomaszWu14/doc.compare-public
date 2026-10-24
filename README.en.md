@@ -11,7 +11,7 @@ clearance — built for purchasing and logistics teams.**
 
 ![PO vs proforma comparison result — the quantity difference is highlighted in red](docs/screenshots/porownanie-dokumentow.png)
 
-🌐 Demo: **[doc.compare.twapp.pl](https://doc.compare.twapp.pl)** — a running instance (synthetic data, no AI keys).
+**▶ See the demo: [https://doc.compare.twapp.pl](https://doc.compare.twapp.pl)** (on entry the demo asks for your first name, last name and company) — a running instance (synthetic data, no AI keys).
 Login is restricted to the author (a read-only guest account exists in code but is disabled by default).
 You can run it locally in a few minutes ([see below](#how-to-run)).
 
