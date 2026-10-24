@@ -35,3 +35,17 @@ def test_explicit_cache_control_is_kept():
         resp.headers["Cache-Control"] = "public, max-age=60"
         resp = app_mod._set_security_headers(resp)
     assert resp.headers.get("Cache-Control") == "public, max-age=60"
+
+
+def test_csp_allows_portfolio_pixel_host(client):
+    # img-src musi dopuszczać portfolio.twapp.pl — tam ładuje się piksel statystyk demo.
+    csp = client.get("/login").headers.get("Content-Security-Policy", "")
+    assert "https://portfolio.twapp.pl" in csp
+
+
+def test_tracking_pixel_on_login_page(client):
+    # Piksel statystyk portfolio musi się ładować także na ekranie logowania
+    # (login.html nie dziedziczy z base.html — ma własny <img>).
+    html = client.get("/login").get_data(as_text=True)
+    assert 'src="https://portfolio.twapp.pl/px/doccompare"' in html
+    assert html.count("portfolio.twapp.pl/px/doccompare") == 1
