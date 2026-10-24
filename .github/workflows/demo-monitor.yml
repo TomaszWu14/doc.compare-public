@@ -1,7 +1,9 @@
 name: Monitor demo
 
-# Co 6 godzin sprawdza publiczne demo (https://doc.compare.twapp.pl): /login musi zwrócić 200,
-# a / — 200 albo przekierowanie na stronę logowania (niezalogowany gość trafia na /login).
+# Co 6 godzin sprawdza publiczne demo (https://doc.compare.twapp.pl). Na demo działa bramka
+# odwiedzin (blueprints/demo_gate.py): niezalogowany gość z / i /login trafia na /demo-gate.
+# Dlatego sprawdzamy ścieżki wyłączone z bramki: /health i /demo-gate muszą zwrócić 200,
+# a / — 200 albo przekierowanie na /demo-gate (lub /login, gdy bramka jest wyłączona).
 # Awaria → issue „Demo nie odpowiada” z etykietą `demo` (jedno, kolejne awarie dopisują komentarz);
 # pierwszy udany przebieg po awarii zamyka issue. Tylko GITHUB_TOKEN, bez sekretów.
 on:
@@ -28,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Sprawdź /login i /
+      - name: Sprawdź /health, /demo-gate i /
         id: check
         shell: bash
         run: |
@@ -40,16 +42,19 @@ jobs:
               -w '%{http_code} %{redirect_url}' "$DEMO_URL$1" 2>/dev/null || echo "000 "
           }
 
-          read -r code _ <<<"$(probe /login)"
-          [ "$code" = 200 ] || problems+=("/login zwraca HTTP $code (oczekiwane 200)")
+          read -r code _ <<<"$(probe /health)"
+          [ "$code" = 200 ] || problems+=("/health zwraca HTTP $code (oczekiwane 200)")
+
+          read -r code _ <<<"$(probe /demo-gate)"
+          [ "$code" = 200 ] || problems+=("/demo-gate zwraca HTTP $code (oczekiwane 200)")
 
           read -r code location <<<"$(probe /)"
           case "$code" in
             200) ;;
             301|302|303|307|308)
-              [[ "$location" == */login* ]] \
-                || problems+=("/ przekierowuje na ${location:-?} zamiast na /login") ;;
-            *) problems+=("/ zwraca HTTP $code (oczekiwane 200 albo przekierowanie na /login)") ;;
+              [[ "$location" == */demo-gate* || "$location" == */login* ]] \
+                || problems+=("/ przekierowuje na ${location:-?} zamiast na /demo-gate lub /login") ;;
+            *) problems+=("/ zwraca HTTP $code (oczekiwane 200 albo przekierowanie na /demo-gate lub /login)") ;;
           esac
 
           if [ ${#problems[@]} -eq 0 ]; then
