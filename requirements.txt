@@ -23,7 +23,7 @@ paddlepaddle                   # Framework Baidu (CPU) — wymagany przez Paddle
 paddleocr>=2.7                 # PaddleOCR: najwyższa dokładność na drukowanym tekście (85-90%)
 easyocr>=1.7                   # Neural OCR: 80+ języków — fallback dla cyrylicy i trudnych cropów
 python-doctr[torch]>=1.1.0       # DocTR: głęboki OCR — tertiary fallback (wysokie recall na etykietach)
-pdf2image>=1.16                # PDF → obrazy dla OCR
+pdf2image>=1.17.0                # PDF → obrazy dla OCR
 pillow>=13.0,<14.0             # Przetwarzanie obrazów; <13.0 has known CVEs
 opencv-python-headless>=4.8
 

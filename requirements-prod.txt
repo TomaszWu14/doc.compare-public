@@ -24,7 +24,7 @@ camelot-py>=0.11
 
 # ── OCR (basic — Tesseract via system package) ────────────────────────────────
 pytesseract>=0.3
-pdf2image>=1.16
+pdf2image>=1.17.0
 pillow>=13.0
 
 # ── Image processing ─────────────────────────────────────────────────────────
