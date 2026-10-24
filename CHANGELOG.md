@@ -6,6 +6,7 @@ Wersja aplikacji: `constants.APP_VERSION`.
 ## [Unreleased]
 
 ### Added
+- Monitor demo (`demo-monitor.yml`): push ntfy przy otwarciu zgłoszenia „Demo nie odpowiada” i po powrocie do normy (opcjonalny sekret `NTFY_URL`).
 - Adres kontaktowy w klauzuli RODO bramki demo (PL/EN) zapisany jako `tomasz.wierzbowski [at] op.pl`, żeby nie dał się zebrać botom
   zbierającym adresy (`blueprints/demo_gate.py`, `tests/test_demo_gate.py`).
 - Monitoring gości demo v2: alarm „UWAGA firma z listy” (`NTFY_WATCH_COMPANIES`, dopasowanie bez wielkości

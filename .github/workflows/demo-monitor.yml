@@ -5,7 +5,7 @@ name: Monitor demo
 # Dlatego sprawdzamy ścieżki wyłączone z bramki: /health i /demo-gate muszą zwrócić 200,
 # a / — 200 albo przekierowanie na /demo-gate (lub /login, gdy bramka jest wyłączona).
 # Awaria → issue „Demo nie odpowiada” z etykietą `demo` (jedno, kolejne awarie dopisują komentarz);
-# pierwszy udany przebieg po awarii zamyka issue. Tylko GITHUB_TOKEN, bez sekretów.
+# pierwszy udany przebieg po awarii zamyka issue. GITHUB_TOKEN + opcjonalny sekret NTFY_URL (push ntfy).
 on:
   schedule:
     - cron: '17 */6 * * *'   # co 6 h, poza pełną godziną (mniej opóźnień w GitHub)
@@ -76,13 +76,20 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+          NTFY_URL: ${{ secrets.NTFY_URL }}
         run: |
+          # push ntfy (opcjonalny: bez sekretu NTFY_URL pomijamy; nigdy nie psuje przebiegu)
+          ntfy() {
+            case "${NTFY_URL:-}" in https://*) ;; *) echo "NTFY_URL nie ustawiony lub nie https — pomijam push"; return 0;; esac
+            curl -fsS --max-time 10 -H "Title: $1" -H "Priority: $2" -H "Tags: $3" -d "$4" "$NTFY_URL" || true
+          }
           gh label create "$LABEL" --color B60205 --description "Automatyczny monitor demo" 2>/dev/null || true
           open=$(gh issue list --label "$LABEL" --state open --search "in:title \"$TITLE\"" --json number --jq '.[0].number // empty')
           if [ -n "$open" ]; then
             gh issue comment "$open" --body-file report.md
           else
             gh issue create --title "$TITLE" --label "$LABEL" --body-file report.md
+            ntfy "Demo nie odpowiada: doc.compare-public" high warning "Demo przestało odpowiadać. Szczegóły: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           fi
           exit 1   # czerwony przebieg = mail z GitHub do właściciela repozytorium
 
@@ -91,7 +98,17 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+          NTFY_URL: ${{ secrets.NTFY_URL }}
         run: |
+          # push ntfy (opcjonalny: bez sekretu NTFY_URL pomijamy; nigdy nie psuje przebiegu)
+          ntfy() {
+            case "${NTFY_URL:-}" in https://*) ;; *) echo "NTFY_URL nie ustawiony lub nie https — pomijam push"; return 0;; esac
+            curl -fsS --max-time 10 -H "Title: $1" -H "Priority: $2" -H "Tags: $3" -d "$4" "$NTFY_URL" || true
+          }
           for n in $(gh issue list --label "$LABEL" --state open --search "in:title \"$TITLE\"" --json number --jq '.[].number'); do
             gh issue close "$n" --comment "Demo znów odpowiada ($(date -u '+%Y-%m-%d %H:%M UTC'))."
+            recovered=1
           done
+          if [ -n "${recovered:-}" ]; then
+            ntfy "Demo znowu odpowiada: doc.compare-public" low white_check_mark "Demo znowu odpowiada. Przebieg: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          fi
