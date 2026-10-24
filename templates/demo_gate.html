@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>{{ tx.title }} — DocCompare</title>
+<style>
+:root{--bg:#0f1119;--surface:#181b27;--border:#252840;--accent:#5b9bff;--text:#edf0f7;--muted:#9aa3bd;--error:#ff5c5c}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 32px;width:100%;max-width:460px}
+h1{font-size:22px;margin-bottom:8px}.lead{font-size:14px;color:var(--muted);margin-bottom:22px;line-height:1.5}
+.field{margin-bottom:16px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600}
+input[type=text]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--text);font-size:14px}
+input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:13px;margin:6px 0 16px;line-height:1.4}
+.consent input{margin-top:3px}
+.btn{width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer}
+.err{background:rgba(255,92,92,.08);border:1px solid rgba(255,92,92,.3);color:var(--error);border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:16px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.gdpr{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:18px}
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>{{ tx.title }}</h1>
+  <p class="lead">{{ tx.lead }}</p>
+  {% if error %}<div class="err" role="alert">{{ error }}</div>{% endif %}
+  <form method="POST" action="/demo-gate" autocomplete="off">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="next" value="{{ next }}">
+    <div class="field"><label for="first">{{ tx.first }}</label>
+      <input type="text" id="first" name="first" value="{{ form.first }}" minlength="2" maxlength="100" required autocomplete="given-name"></div>
+    <div class="field"><label for="last">{{ tx.last }}</label>
+      <input type="text" id="last" name="last" value="{{ form.last }}" minlength="2" maxlength="100" required autocomplete="family-name"></div>
+    <div class="field"><label for="company">{{ tx.company }}</label>
+      <input type="text" id="company" name="company" value="{{ form.company }}" minlength="2" maxlength="100" required autocomplete="organization"></div>
+    <div class="hp" aria-hidden="true"><label for="website">Website</label>
+      <input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></div>
+    <label class="consent" for="gdpr" style="text-transform:none;color:var(--text);font-weight:400">
+      <input type="checkbox" id="gdpr" name="gdpr" value="1" required><span>{{ tx.consent }}</span></label>
+    <button type="submit" class="btn">{{ tx.submit }}</button>
+  </form>
+  <p class="gdpr">{{ tx.gdpr }}</p>
+</main>
+</body>
+</html>

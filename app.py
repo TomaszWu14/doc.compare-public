@@ -205,11 +205,13 @@ from blueprints.incoterms import bp as _incoterms_bp, ensure_incoterms_table as 
 from blueprints.translation_dict import bp as _translation_dict_bp
 from blueprints.transit_countries import bp as _transit_bp, list_countries as _list_transit_countries
 from blueprints.palviz import bp as _palviz_bp
+from blueprints.demo_gate import bp as _demo_gate_bp
 from blueprints.suppliers import bp as _suppliers_bp
 from blueprints.warehouse import bp as _warehouse_bp
 from blueprints.kolejka import bp as _kolejka_bp
 from blueprints.api_invoices import bp as _api_invoices_bp
 from invoice_routes import invoice_bp
+app.register_blueprint(_demo_gate_bp)  # bramka odwiedzin demo (DEMO_VISITOR_GATE)
 app.register_blueprint(_auth_bp)
 app.register_blueprint(_incoterms_bp)
 app.register_blueprint(_translation_dict_bp)
@@ -13852,6 +13854,13 @@ def _is_ssrf_blocked_url(url: str) -> bool:
     return False
 
 
+class _NoRedirectHandler(__import__("urllib.request").request.HTTPRedirectHandler):
+    """Webhooki nie podążają za przekierowaniami (obejście SSRF przez 3xx → adres wewnętrzny)."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None  # 3xx kończy się HTTPError → dostawa uznana za nieudaną
+
+
 def _fire_webhooks(event: str, payload: dict):
     """Wysyła payload JSON do wszystkich aktywnych webhooków pasujących do eventu.
 
@@ -13885,7 +13894,8 @@ def _fire_webhooks(event: str, payload: dict):
                 headers["X-DocCompare-Signature"] = f"sha256={sig}"
             req = _ur.Request(row["url"], data=body, headers=headers, method="POST")
             # bandit: URL webhooka: http(s) wymuszone przy zapisie + _is_ssrf_blocked_url (schemat/prywatne IP)
-            with _ur.urlopen(req, timeout=10) as _resp:  # nosec B310
+            _opener = _ur.build_opener(_NoRedirectHandler)
+            with _opener.open(req, timeout=10) as _resp:  # nosec B310
                 pass
         except Exception as _e:
             logger.warning("webhook delivery failed to %s: %s", row["url"], _e)

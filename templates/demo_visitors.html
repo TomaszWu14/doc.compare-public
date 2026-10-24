@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Odwiedzający demo — DocCompare</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f1119;color:#edf0f7;margin:0;padding:24px}
+h1{font-size:20px;margin-bottom:6px}p{color:#9aa3bd;font-size:13px;margin-bottom:16px}
+table{border-collapse:collapse;width:100%;max-width:1200px}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid #252840;font-size:14px}
+th{color:#9aa3bd;font-size:12px}a{color:#5b9bff}
+</style>
+</head>
+<body>
+<h1>Odwiedzający wersję demo</h1>
+<p>Wpisy: {{ rows|length }} (od najnowszych). Czas = ostatni ekran − wejście. Dane są automatycznie usuwane po {{ retention }} dniach. <a href="/">Wróć</a></p>
+<table>
+  <thead><tr><th>Data (UTC)</th><th>Imię</th><th>Nazwisko</th><th>Firma</th><th>Ekrany</th><th>Czas</th><th>Najczęściej</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr><td>{{ r.created_at }}</td><td>{{ r.first_name }}</td><td>{{ r.last_name }}</td><td>{{ r.company }}</td><td>{{ r.page_views }}</td><td>{{ r.duration }}</td><td>{{ r.top_sections }}</td></tr>
+  {% else %}
+    <tr><td colspan="7">Brak wpisów.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</body>
+</html>

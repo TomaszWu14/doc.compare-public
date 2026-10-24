@@ -10,7 +10,7 @@
 
 <!-- DO UZUPEŁNIENIA (autor): GIF docs/screenshots/demo.gif i link do 2-min wideo — dodać tutaj, gdy będą nagrane. -->
 
-🌐 Demo: **[doc.compare.twapp.pl](https://doc.compare.twapp.pl)** — działająca instancja (dane syntetyczne, bez kluczy AI). Logowanie tylko dla autora (konto gościa jest w kodzie, ale domyślnie wyłączone). Lokalnie uruchomisz aplikację w kilka minut ([niżej](#jak-uruchomić)).
+**▶ Zobacz demo: [https://doc.compare.twapp.pl](https://doc.compare.twapp.pl)** (przy wejściu demo poprosi o imię, nazwisko i firmę) — działająca instancja (dane syntetyczne, bez kluczy AI). Logowanie tylko dla autora (konto gościa jest w kodzie, ale domyślnie wyłączone). Lokalnie uruchomisz aplikację w kilka minut ([niżej](#jak-uruchomić)).
 
 > **Projekt portfolio.** Nazwy firm są zastąpione fikcyjnymi (ACME), dane demo i testowe są syntetyczne.
 
