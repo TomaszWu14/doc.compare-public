@@ -6,6 +6,8 @@ Wersja aplikacji: `constants.APP_VERSION`.
 ## [Unreleased]
 
 ### Added
+- Przepustka z portfolio: gość z ciasteczkiem `gosc` (weryfikacja `GET {PORTFOLIO_URL}/api/gosc`, env `PORTFOLIO_URL`, `PORTFOLIO_PASS`)
+  wchodzi bez formularza bramki i bez zapisu danych (`blueprints/portfolio_pass.py`); strona bramki nie ładuje już piksela portfolio.
 - Monitor demo (`demo-monitor.yml`): push ntfy przy otwarciu zgłoszenia „Demo nie odpowiada” i po powrocie do normy (opcjonalny sekret `NTFY_URL`).
 - Adres kontaktowy w klauzuli RODO bramki demo (PL/EN) zapisany jako `tomasz.wierzbowski [at] op.pl`, żeby nie dał się zebrać botom
   zbierającym adresy (`blueprints/demo_gate.py`, `tests/test_demo_gate.py`).
