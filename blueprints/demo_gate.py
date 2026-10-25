@@ -17,7 +17,8 @@ Przechowujemy wyłącznie imię, nazwisko, firmę, datę i aktywność w demo (l
 obejrzanych ekranów, ostatnia wizyta — blueprints/visitor_activity.py), bez IP i user-agenta;
 wpisy starsze niż 90 dni kasujemy przy każdym zapisie. Ciasteczko niesie podpisane id wpisu
 (`{"id": N}`); stare ciasteczka `"ok"` (sprzed liczenia aktywności) nadal wpuszczają, ale nie są
-liczone. Po udanym zapisie: push ntfy (blueprints/visitor_notify.py, no-op bez NTFY_URL).
+liczone. Przepustka z portfolio (ciasteczko `gosc`, blueprints/portfolio_pass.py) wpuszcza
+bez formularza i bez zapisu gościa (ciasteczko „ok”, bez własnego pusha). Po udanym zapisie: push ntfy (blueprints/visitor_notify.py, no-op bez NTFY_URL).
 Import: core/db (blueprint → core, nigdy → app).
 """
 
@@ -30,6 +31,7 @@ from datetime import datetime, timedelta, timezone
 from flask import (
     Blueprint,
     current_app,
+    g,
     redirect,
     render_template,
     request,
@@ -42,6 +44,7 @@ from core.audit import log_audit as _log_audit
 from core.security import require_role, verify_csrf
 from db import get_db
 
+from blueprints import portfolio_pass as _portfolio
 from blueprints import visitor_activity as _activity
 from blueprints.visitor_notify import notify_visitor
 
@@ -215,6 +218,22 @@ def _safe_next(value: str | None) -> str:
     return "/"
 
 
+def _set_pass_cookie(resp, payload) -> None:
+    resp.set_cookie(
+        COOKIE_NAME,
+        _serializer().dumps(payload),
+        max_age=COOKIE_MAX_AGE,
+        httponly=True,
+        samesite="Lax",
+        secure=bool(current_app.config.get("SESSION_COOKIE_SECURE")),
+    )
+
+
+def _portfolio_pass_ok() -> bool:
+    """Przepustka z portfolio (ciasteczko `gosc`, blueprints/portfolio_pass.py); bez zapisu gościa."""
+    return _portfolio.valid_pass(request.cookies.get(_portfolio.COOKIE_NAME))
+
+
 def _lang() -> str:
     return "en" if session.get("lang") == "en" else "pl"
 
@@ -225,6 +244,9 @@ def _gate():
         return None
     if session.get("user_id") or has_pass():
         return None
+    if _portfolio_pass_ok():
+        g.portfolio_pass = True  # ciasteczko dema ustawia _track; push o gościu wysyła portfolio
+        return None
     if request.method == "GET":
         nxt = request.full_path.rstrip("?")
         return redirect(url_for("demo_gate.gate", next=nxt))
@@ -234,6 +256,8 @@ def _gate():
 @bp.after_app_request
 def _track(resp):
     """Liczy obejrzany ekran: udany (2xx) GET strony HTML od gościa z id w ciasteczku."""
+    if g.get("portfolio_pass"):  # flaga „ok”: wpuszcza bez zapisu danych, nie jest liczona
+        _set_pass_cookie(resp, "ok")
     try:
         if (
             request.method == "GET"
@@ -255,6 +279,11 @@ def gate():
     if not gate_enabled():
         return ("Nie znaleziono", 404)
     nxt = _safe_next(request.values.get("next"))
+    if request.method == "GET" and not (session.get("user_id") or has_pass()):
+        if _portfolio_pass_ok():
+            resp = redirect(nxt)
+            _set_pass_cookie(resp, "ok")
+            return resp
     tx = TEXTS[_lang()]
     status, error = 200, None
     form = {"first": "", "last": "", "company": ""}
@@ -278,14 +307,7 @@ def gate():
                     db.close()
                 notify_visitor(*vals)
                 resp = redirect(nxt)
-                resp.set_cookie(
-                    COOKIE_NAME,
-                    _serializer().dumps({"id": vid} if vid else "ok"),
-                    max_age=COOKIE_MAX_AGE,
-                    httponly=True,
-                    samesite="Lax",
-                    secure=bool(current_app.config.get("SESSION_COOKIE_SECURE")),
-                )
+                _set_pass_cookie(resp, {"id": vid} if vid else "ok")
                 return resp
     return render_template(
         "demo_gate.html", tx=tx, lang=_lang(), error=error, form=form, next=nxt
