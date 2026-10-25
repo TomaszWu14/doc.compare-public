@@ -4,6 +4,8 @@ name: Monitor demo
 # odwiedzin (blueprints/demo_gate.py): niezalogowany gość z / i /login trafia na /demo-gate.
 # Dlatego sprawdzamy ścieżki wyłączone z bramki: /health i /demo-gate muszą zwrócić 200,
 # a / — 200 albo przekierowanie na /demo-gate (lub /login, gdy bramka jest wyłączona).
+# Od 24.10 przed aplikacją stoi też bramka portfolio (ForwardAuth): / i /demo-gate mogą wtedy
+# zwrócić 401 z formularzem portfolio.twapp.pl/wejscie — to też wynik poprawny; /health dalej 200.
 # Awaria → issue „Demo nie odpowiada” z etykietą `demo` (jedno, kolejne awarie dopisują komentarz);
 # pierwszy udany przebieg po awarii zamyka issue. GITHUB_TOKEN + opcjonalny sekret NTFY_URL (push ntfy).
 on:
@@ -37,33 +39,51 @@ jobs:
           set -uo pipefail
           problems=()
           # Zwraca "<kod HTTP> <adres przekierowania>"; bez -L, żeby widzieć samo przekierowanie.
+          # Treść odpowiedzi trafia do page.html (do rozpoznania bramki portfolio).
           probe() {
-            curl -sS -o /dev/null --max-time 30 --retry 3 --retry-delay 15 --retry-all-errors \
+            rm -f page.html   # curl nie tworzy pliku przy pustej treści — bez starej strony
+            curl -sS -o page.html --max-time 30 --retry 3 --retry-delay 15 --retry-all-errors \
               -w '%{http_code} %{redirect_url}' "$DEMO_URL$1" 2>/dev/null || echo "000 "
           }
+          # Od 24.10 demo stoi za ForwardAuth portfolio: bez ciasteczka `gosc` strony dają 401
+          # z formularzem bramki (link do portfolio.twapp.pl/wejscie) — to znaczy, że bramka działa.
+          # Dowodem życia aplikacji jest wtedy /health (ForwardAuth go przepuszcza), który MUSI dać 200.
+          bramka() { [ "$1" = 401 ] && grep -qF 'portfolio.twapp.pl/wejscie' page.html 2>/dev/null; }
+          za_bramka=''
 
           read -r code _ <<<"$(probe /health)"
           [ "$code" = 200 ] || problems+=("/health zwraca HTTP $code (oczekiwane 200)")
 
           read -r code _ <<<"$(probe /demo-gate)"
-          [ "$code" = 200 ] || problems+=("/demo-gate zwraca HTTP $code (oczekiwane 200)")
+          if [ "$code" = 200 ]; then
+            :
+          elif bramka "$code"; then
+            za_bramka=1
+          else
+            problems+=("/demo-gate zwraca HTTP $code (oczekiwane 200 albo 401 z bramką portfolio)")
+          fi
 
           read -r code location <<<"$(probe /)"
+          bramka "$code" && { za_bramka=1; code=bramka; }
           case "$code" in
-            200) ;;
+            200|bramka) ;;
             301|302|303|307|308)
               [[ "$location" == */demo-gate* || "$location" == */login* ]] \
                 || problems+=("/ przekierowuje na ${location:-?} zamiast na /demo-gate lub /login") ;;
-            *) problems+=("/ zwraca HTTP $code (oczekiwane 200 albo przekierowanie na /demo-gate lub /login)") ;;
+            *) problems+=("/ zwraca HTTP $code (oczekiwane 200, 401 z bramką portfolio albo przekierowanie na /demo-gate lub /login)") ;;
           esac
 
+          note=''
+          [ -n "$za_bramka" ] && note=' Za bramką portfolio – sprawdzono tylko zdrowie.'
+
           if [ ${#problems[@]} -eq 0 ]; then
-            echo "Demo $DEMO_URL odpowiada." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "Demo $DEMO_URL odpowiada.$note" | tee -a "$GITHUB_STEP_SUMMARY"
             echo "ok=true" >> "$GITHUB_OUTPUT"
           else
             {
               echo "Demo $DEMO_URL — problemy ($(date -u '+%Y-%m-%d %H:%M UTC')):"
               for p in "${problems[@]}"; do echo "- $p"; done
+              [ -z "$note" ] || echo "-$note"
               echo
               echo "Przebieg: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             } > report.md
